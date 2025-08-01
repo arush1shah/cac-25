@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 print("Starting Flask app...")
 
 from flask import Flask, request, jsonify
@@ -68,3 +69,13 @@ def fidget_tools():
 
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+from flask import Flask
+from routes.audio import audio_bp
+
+app = Flask(__name__)
+app.register_blueprint(audio_bp)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+>>>>>>> e67195d (Working code for transcribing from a lecture recording and summarizing, probably needs some more prompt tuning)
