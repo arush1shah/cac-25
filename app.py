@@ -11,7 +11,6 @@ from flask import Flask, request, jsonify, render_template
 
 app = Flask(__name__)
 
-OPENAI_API_KEY = "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"
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
