@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Fidget Tools</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 40px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .bubble {
+            display: inline-block;
+            background: lightblue;
+            padding: 15px;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .bubble:active {
+            transform: scale(0.9);
+            background: pink;
+        }
+    </style>
+</head>
+<body>
+    <h1>Fidget Tools</h1>
+
+    <!-- Click Counter -->
+    <div>
+        <h2>Click Counter</h2>
+        <p id="count">0</p>
+        <button onclick="increment()">Click me!</button>
+    </div>
+
+    <!-- Spinner -->
+    <div>
+        <h2>Spinner</h2>
+        <button onclick="spin()">Spin</button>
+        <p id="spinResult"></p>
+    </div>
+
+    <!-- Bubble Pop -->
+    <div>
+        <h2>Bubble Pop</h2>
+        <div id="bubbles"></div>
+    </div>
+
+    <script>
+        let count = 0;
+        function increment() {
+            count++;
+            document.getElementById("count").innerText = count;
+        }
+
+        function spin() {
+            const options = ["🎯", "⭐", "💡", "🔥", "💎"];
+            const random = options[Math.floor(Math.random() * options.length)];
+            document.getElementById("spinResult").innerText = random;
+        }
+
+        // Create bubble buttons
+        const bubblesContainer = document.getElementById("bubbles");
+        for (let i = 0; i < 20; i++) {
+            const bubble = document.createElement("div");
+            bubble.className = "bubble";
+            bubble.innerText = "🫧";
+            bubble.onclick = () => bubble.remove();
+            bubblesContainer.appendChild(bubble);
+        }
+    </script>
+</body>
+</html>
