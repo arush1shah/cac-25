@@ -15,7 +15,7 @@ UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # # Initialize OpenAI client (make sure to set your API key as an environment variable before running)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", OPENAI_API_KEY))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def simplify_text(text):
     """Send extracted text to GPT for simplification."""
