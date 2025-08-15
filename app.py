@@ -1,4 +1,3 @@
-
 print("Starting Flask app...")
 
 from flask import Flask, request, jsonify
@@ -71,5 +70,4 @@ def fidget_tools():
 if __name__ == '__main__':
     app.run(debug=True)
 print("This is my version of app.py")
-
 
