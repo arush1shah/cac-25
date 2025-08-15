@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 print("Starting Flask app...")
 
 from flask import Flask, request, jsonify
@@ -6,10 +6,12 @@ from PIL import Image
 import pytesseract
 import os
 from openai import OpenAI
-from flask import Flask, request, jsonify, render_template
+from routes.audio import audio_bp
+from flask import Flask, request, jsonify, render_templatel
 
 
 app = Flask(__name__)
+app.register_blueprint(audio_bp)
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -68,13 +70,6 @@ def fidget_tools():
 
 if __name__ == '__main__':
     app.run(debug=True)
-=======
-from flask import Flask
-from routes.audio import audio_bp
+print("This is my version of app.py")
 
-app = Flask(__name__)
-app.register_blueprint(audio_bp)
 
-if __name__ == "__main__":
-    app.run(debug=True)
->>>>>>> e67195d (Working code for transcribing from a lecture recording and summarizing, probably needs some more prompt tuning)
