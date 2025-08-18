@@ -1,25 +1,30 @@
-import shutil
+# utils/whisper_transcribe.py
 import whisper
-import tempfile
-import os
-os.environ["PATH"] += os.pathsep + "/opt/homebrew/bin"
 
-model = whisper.load_model("base")
+print("Loading Whisper model...")
+# Using "base" is fast. "small" or "medium" are more accurate.
+whisper_model = whisper.load_model("base")
+print("Whisper model loaded.")
 
-def transcribe_audio(path):
-    try:
-        print(f"Processing file: {path}")
-        if os.path.getsize(path) < 512:
-            raise RuntimeError("Audio file is too small or invalid.")
-        
-        result = model.transcribe(path)
-        return result["text"]
-    except Exception as e:
-        print(f"Error during transcription: {e}")
-        raise RuntimeError("Failed to process audio file")
-    finally:
-         if os.path.exists(path):
-            os.remove(path)
-
-
+def transcribe_audio(file_path, language=None):
+    """
+    Transcribes the audio file using Whisper.
+    Accepts an optional language code.
+    Returns a dictionary with the transcription text and detected language.
+    """
+    print(f"Starting transcription for {file_path} with language '{language}'...")
     
+    # Let Whisper auto-detect if language is 'auto' or not provided
+    transcribe_options = {}
+    if language and language != 'auto':
+        transcribe_options['language'] = language
+
+    result = whisper_model.transcribe(file_path, **transcribe_options)
+    
+    print(f"Transcription complete. Detected language: {result['language']}")
+    
+    # Return both the text and the language Whisper detected/used
+    return {
+        'text': result['text'],
+        'language': result['language']
+    }
