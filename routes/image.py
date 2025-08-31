@@ -1,34 +1,26 @@
-# routes/image.py
-
 from flask import Blueprint, request, jsonify
 from PIL import Image
 import pytesseract
 import os
 from openai import OpenAI
+from utils.tts import speak_text  # <-- import your TTS function
 
-# --- Blueprint Setup ---
 image_bp = Blueprint('image', __name__)
 
-# --- Initialization ---
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# --- Helper Function ---
 def simplify_text(text):
-    """Send extracted text to GPT for simplification."""
-    if not text.strip():
-        return "No text was extracted from the image to simplify."
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that simplifies complex text into clear, easy-to-understand language."},
-            {"role": "user", "content": f"Please simplify this text:\n\n{text}"}
+            {"role": "system", "content": "You are a helpful assistant that simplifies text."},
+            {"role": "user", "content": f"Summarize the text from this image into a clear, concise paragraph:\n\n{text}"}
         ]
     )
     return response.choices[0].message.content.strip()
 
-# --- Route ---
 @image_bp.route('/upload-image', methods=['POST'])
 def upload_image():
     if 'image' not in request.files:
@@ -41,22 +33,19 @@ def upload_image():
     filepath = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(filepath)
 
-    try:
-        image = Image.open(filepath)
-        extracted_text = pytesseract.image_to_string(image)
-        simplified_text = simplify_text(extracted_text)
-        
-        # Clean up the uploaded file
-        os.remove(filepath)
+    image = Image.open(filepath)
+    extracted_text = pytesseract.image_to_string(image)
+    simplified_text_result = simplify_text(extracted_text)
 
-        return jsonify({
-            'message': 'Image processed successfully',
-            'extracted_text': extracted_text,
-            'simplified_text': simplified_text
-        }), 200
-    except Exception as e:
-        # Clean up the file on error too
-        if os.path.exists(filepath):
-            os.remove(filepath)
-        print(f"Error processing image: {e}")
-        return jsonify({'error': 'Failed to process image'}), 500
+    # Optional TTS
+    read_aloud = request.form.get('read_aloud', 'false').lower() == 'true'
+    if read_aloud:
+        speak_text(simplified_text_result)
+
+    os.remove(filepath)  # cleanup
+
+    return jsonify({
+        'extracted_text': extracted_text,
+        'simplified_text': simplified_text_result,
+        'read_aloud': read_aloud
+    })
