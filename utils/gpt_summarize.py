@@ -53,4 +53,11 @@ def summarize_text(text, language='en'):
             model="gpt-4", # Or gpt-4o for even better results
             messages=[
                 # The 'system' role is perfect for this kind of detailed instruction
-                {"role": "system", 
+                {"role": "system", "content": prompt_message},
+                {"role": "user", "content": text}
+            ]
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"An error occurred during summarization: {e}")
+        return f"Error during summarization: {e}"
