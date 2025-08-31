@@ -88,5 +88,54 @@
             }
         });
     </script>
+
+<h1>Upload Image for Simplified Text</h1>
+<form id="image-form">
+    <label for="image-file">Select an image:</label>
+    <input type="file" id="image-file" name="image" accept="image/*" required>
+
+    <label>
+        <input type="checkbox" id="read-aloud" name="read_aloud">
+        Read simplified text out loud
+    </label>
+
+    <button type="submit">Upload and Simplify</button>
+</form>
+
+<div id="image-results" style="display: none;">
+    <h2>Extracted Text</h2>
+    <div id="extracted-text"></div>
+    <h2>Simplified Text</h2>
+    <div id="simplified-text"></div>
+</div>
+
+<script>
+document.getElementById('image-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById('image-file');
+    const readAloud = document.getElementById('read-aloud').checked;
+    const imageFile = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('read_aloud', readAloud);  // pass checkbox value
+
+    try {
+        const response = await fetch('/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        document.getElementById('extracted-text').innerText = data.extracted_text;
+        document.getElementById('simplified-text').innerText = data.simplified_text;
+        document.getElementById('image-results').style.display = 'block';
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+});
+</script>
+
 </body>
 </html>
