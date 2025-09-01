@@ -24,8 +24,11 @@ numba==0.61.2
 numpy==2.2.6
 openai==1.91.0
 openai-whisper==20250625
+packaging==25.0
+pillow==11.3.0
 pydantic==2.11.7
 pydantic_core==2.33.2
+pytesseract==0.3.13
 python-dotenv==1.1.1
 regex==2024.11.6
 requests==2.32.4

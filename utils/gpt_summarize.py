@@ -1,4 +1,4 @@
-# utils/gpt_summarize.py
+#utils/gpt_summarize.py
 import openai
 from dotenv import load_dotenv
 
@@ -25,9 +25,11 @@ def summarize_text(text, language='en'):
     # --- REPLACE THE PROMPT HERE ---
     # This is the new, more detailed prompt (Option 2)
     prompt_message = f"""
-    You are an expert university teaching assistant. Your task is to summarize a lecture for a student who missed the class. The lecture is in {language_name}.
+    You are an expert university teaching assistant. Your task is to create notes for a lecture for a student who missed the class. The lecture is in {language_name}.
 
     Your notes must be clear, intuitive, and capture the most important points.
+
+      **CRITICAL INSTRUCTION:** When you identify an important keyword, definition, or concept, you MUST wrap it in special markers like this: _highlight_the important phrase_highlight_. Do NOT bold the term, only use these exact markers.
 
     Please structure your output as follows:
 
@@ -35,7 +37,7 @@ def summarize_text(text, language='en'):
     Start with a short, easy-to-understand paragraph explaining the overall topic of the lecture.
 
     **2. Key Concepts & Explanations:**
-    List the main concepts discussed. For each concept, provide a simple explanation. Define all important terms. Crucially, **you must include the professor's helpful analogies and informal terms (like 'doomed space' or 'death space')**, as they are key to understanding the material.
+    List the main concepts discussed in bullet points. For each concept, provide a simple explanation that is detailed enough for a student to understand. Define all important terms, using your own knowledge if necessary. Crucially, **you must include the professor's helpful analogies and informal terms (like 'doomed space' or 'death space')**, as they are key to understanding the material.
 
     **3. How It All Connects:**
     Explain how the different concepts build on each other. For example, how do the simple 2D rotations relate to the more complex 3D and 4D ones? Why are these rotation matrices important for things like computer graphics or data science?
@@ -44,9 +46,7 @@ def summarize_text(text, language='en'):
     End with the single most important idea the student should remember from this lecture.
 
     Write the entire summary in {language_name}.
-    """
-    # --- END OF PROMPT REPLACEMENT ---
-    
+    """    
     print(f"Sending text to GPT-4 with the new, improved prompt...")
     try:
         response = client.chat.completions.create(

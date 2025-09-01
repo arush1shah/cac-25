@@ -3,8 +3,19 @@ import whisper
 
 print("Loading Whisper model...")
 # Using "base" is fast. "small" or "medium" are more accurate.
-whisper_model = whisper.load_model("base")
+whisper_model = None
 print("Whisper model loaded.")
+def load_whisper_model():
+    """
+    This function loads the Whisper model into the global variable.
+    It's designed to run only once, the first time it's needed.
+    """
+    global whisper_model
+    if whisper_model is None:
+        print("Whisper model is not loaded. Loading now... (This may take a moment)")
+        # Using "base" is fast. "small" or "medium" are more accurate.
+        whisper_model = whisper.load_model("base")
+        print("Whisper model loaded successfully and will be reused.")
 
 def transcribe_audio(file_path, language=None):
     """
@@ -12,6 +23,7 @@ def transcribe_audio(file_path, language=None):
     Accepts an optional language code.
     Returns a dictionary with the transcription text and detected language.
     """
+    load_whisper_model()
     print(f"Starting transcription for {file_path} with language '{language}'...")
     
     # Let Whisper auto-detect if language is 'auto' or not provided
