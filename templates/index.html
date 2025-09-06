@@ -101,11 +101,20 @@
         </div>
         <div id="simplify-module" class="module">
              <h2>Scan & Simplify Image</h2>
-             <form id="ocr-form">
+             <form id="ocr-form" action="/image/upload-image" method="POST" enctype="multipart/form-data">
                 <label for="image-file">Upload Image:</label><input type="file" id="image-file" name="image" accept="image/*" required>
                 <button type="submit" class="primary-btn">Scan Image</button>
             </form>
+            {% if audio_file %}
+    <h3>Audio Playback:</h3>
+    <audio controls>
+        <source src="/uploads/{{ audio_file }}" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+{% endif %}
+
         </div>
+        <script src="{{ url_for('static', filename='js/audio-controls.js') }}"></script>
         <div id="settings-module" class="module">
             <h2>Settings</h2>
             <div class="setting-group"><h4>Display</h4>
@@ -138,6 +147,19 @@
             <button id="save-note-btn" class="primary-btn" style="margin-bottom: 1rem;">Save to Dashboard</button>
             <div id="summary-output" class="formatted-summary"></div>
             <div id="transcription-output" class="transcription-box"></div>
+        </div>
+        <div id="welcome-area">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            {% if extracted_text %}
+                <h3>Extracted Text:</h3>
+                <p>{{ extracted_text }}</p>
+            {% endif %}
+            {% if simplified_text %}
+                <h3>Simplified Text:</h3>
+                <p>{{ simplified_text }}</p>
+            {% endif %}
         </div>
     </main>
 
@@ -268,54 +290,6 @@
             loadNotes();
         });
     </script>
-
-<h1>Upload Image for Simplified Text</h1>
-<form id="image-form">
-    <label for="image-file">Select an image:</label>
-    <input type="file" id="image-file" name="image" accept="image/*" required>
-
-    <label>
-        <input type="checkbox" id="read-aloud" name="read_aloud">
-        Read simplified text out loud
-    </label>
-
-    <button type="submit">Upload and Simplify</button>
-</form>
-
-<div id="image-results" style="display: none;">
-    <h2>Extracted Text</h2>
-    <div id="extracted-text"></div>
-    <h2>Simplified Text</h2>
-    <div id="simplified-text"></div>
-</div>
-
-<script>
-document.getElementById('image-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const fileInput = document.getElementById('image-file');
-    const readAloud = document.getElementById('read-aloud').checked;
-    const imageFile = fileInput.files[0];
-
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    formData.append('read_aloud', readAloud);  // pass checkbox value
-
-    try {
-        const response = await fetch('/upload-image', {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-        document.getElementById('extracted-text').innerText = data.extracted_text;
-        document.getElementById('simplified-text').innerText = data.simplified_text;
-        document.getElementById('image-results').style.display = 'block';
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-});
-</script>
-
+   
 </body>
 </html>
