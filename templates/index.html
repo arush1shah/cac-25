@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AccessAI Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&family=Lora:wght@400;500&display=swap');
         @font-face {
@@ -66,13 +67,34 @@
         .results-container.active { display: block; }
         .results-container { display: none; }
         #reading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: none; pointer-events: none; }
+        #reading-ruler { position: absolute; width: 100%; height: 2.5em; background-color: var(--primary-color); opacity: 0.15; pointer-events: none; display: none; border-radius: 4px; }
+        .main-content.ruler-active #reading-ruler { display: block; }
         
         form { display: flex; flex-direction: column; gap: 1.5rem; }
-        .primary-btn { padding: 0.8rem 1.2rem; border: none; border-radius: 8px; background-color: var(--primary-color); color: #fff; font-size: 1rem; font-weight: 500; transition: all 0.2s; }
+        .primary-btn { padding: 0.8rem 1.2rem; border: none; border-radius: 8px; background-color: var(--primary-color); color: #fff; font-size: 1rem; font-weight: 500; transition: all 0.2s; cursor: pointer; }
         .primary-btn:hover { background-color: #d04d03; }
+        .secondary-btn { background: none; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
+        .secondary-btn.active, .secondary-btn:hover { background: var(--secondary-color); border-color: var(--primary-color); }
         
         .formatted-summary { font-size: var(--reading-font-size); line-height: var(--reading-line-height); letter-spacing: var(--reading-letter-spacing); word-spacing: var(--reading-word-spacing); text-align: var(--reading-text-align); }
         .formatted-summary h3 { font-size: 1.8rem; color: var(--primary-color); }
+        .transcription-box { margin-top: 2rem; border: 1px solid var(--border-color); border-radius: 12px; }
+        .transcription-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
+        .transcription-content { padding: 1.5rem; white-space: pre-wrap; line-height: 1.6; }
+        .transcription-content.hidden { display: none; }
+        
+        /* ADHD Toolkit & Learning Aids */
+        .adhd-toolkit { margin-top: 2.5rem; background: var(--panel-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border-color); display: none; }
+        .toolkit-section { margin-bottom: 2rem; }
+        .toolkit-section:last-child { margin-bottom: 0; }
+        .toolkit-section h4 { font-size: 1.3rem; color: var(--primary-color); margin-top: 0; }
+        .btn-group { display: flex; gap: 1rem; }
+        .quiz-item { margin-bottom: 1rem; }
+        .quiz-item .answer { display: none; background: var(--secondary-color); padding: 0.5rem; border-radius: 4px; margin-top: 0.5rem; }
+        .mnemonic-card { background: var(--secondary-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .mnemonic-card strong { color: var(--primary-color); }
+        .conceptual-graph-container { text-align: center; }
+        .conceptual-graph-container svg { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
@@ -108,6 +130,9 @@
         </div>
         <div id="settings-module" class="module">
             <h2>Settings</h2>
+            <div class="setting-group"><h4>Learning Modes</h4>
+                <div class="setting-item"><label>ADHD Mode</label><label class="switch"><input type="checkbox" id="adhd-mode-toggle"><span class="slider"></span></label></div>
+            </div>
             <div class="setting-group"><h4>Display</h4>
                 <div class="setting-item"><label>High Contrast</label><label class="switch"><input type="checkbox" id="contrast-toggle"><span class="slider"></span></label></div>
                 <div class="setting-item"><label>Highlight Key Terms</label><label class="switch"><input type="checkbox" id="highlight-toggle"><span class="slider"></span></label></div>
@@ -120,6 +145,7 @@
                 <div class="setting-item"><label for="word-spacing">Word Spacing</label><input type="range" id="word-spacing" min="0" max="5" step="0.25" value="0"></div>
             </div>
             <div class="setting-group"><h4>Reading Aids</h4>
+                <div class="setting-item"><label>Reading Ruler</label><label class="switch"><input type="checkbox" id="reading-ruler-toggle"><span class="slider"></span></label></div>
                 <div class="setting-item"><label>Reading Overlays</label>
                     <div class="overlay-btn-group">
                         <button class="overlay-btn" data-color="none">Off</button>
@@ -132,22 +158,51 @@
     </aside>
 
     <main class="main-content" id="main-content">
-        <div class="placeholder" id="placeholder"><h2>Welcome to AccessAI</h2><p>Upload a file or select a saved note to get started.</p></div>
-        <div id="loader" style="display: none;">Processing... Please wait.</div>
+        <div id="reading-ruler"></div>
+        <div class="placeholder" id="placeholder"><h2>Welcome to AccessAI</h2><p>Upload a file or select a saved note.</p></div>
+        <div id="loader" style="display: none;">Processing...</div>
         <div class="results-container" id="results-container">
             <button id="save-note-btn" class="primary-btn" style="margin-bottom: 1rem;">Save to Dashboard</button>
             <div id="summary-output" class="formatted-summary"></div>
-            <div id="transcription-output" class="transcription-box"></div>
+            <div class="adhd-toolkit" id="adhd-toolkit">
+                <div id="adhd-loader" style="display: none;">Building your toolkit...</div>
+                <div id="adhd-content" style="display: none;">
+                    <div class="toolkit-section"><h4>Explain This Differently</h4><div class="btn-group" id="explain-buttons"></div></div>
+                    <div class="toolkit-section"><h4>Auditory Learning</h4><button id="read-aloud-btn" class="secondary-btn">Read Summary Aloud</button></div>
+                    <div class="toolkit-section" id="conceptual-graph-section" style="display: none;">
+                        <h4>Conceptual Graph</h4>
+                        <div id="conceptual-graph-output" class="conceptual-graph-container"></div>
+                    </div>
+                    <div class="toolkit-section" id="dynamic-diagram-section" style="display: none;"><h4>Visual Explanation</h4><div id="dynamic-diagram-output" class="mermaid"></div></div>
+                    <div class="toolkit-section"><h4>Concept Map</h4><div id="concept-map-output" class="mermaid"></div></div>
+                    <div class="toolkit-section"><h4>Memory Aids (Mnemonics)</h4><div id="mnemonics-output"></div></div>
+                    <div class="toolkit-section"><h4>Test Your Knowledge</h4><div id="quiz-output"></div></div>
+                </div>
+            </div>
+            <div id="transcription-output" class="transcription-box">
+                <div class="transcription-header">
+                    <h4></h4> 
+                    <button id="toggle-transcription-btn" class="secondary-btn">Hide Transcription</button>
+                </div>
+                <div class="transcription-content"></div>
+            </div>
         </div>
     </main>
 
     <script>
+        mermaid.initialize({ startOnLoad: false });
         document.addEventListener('DOMContentLoaded', () => {
-            let notes = []; let currentNote = null;
+            let notes = []; let currentNote = null; let adhdData = null;
             const mainContent = document.getElementById('main-content');
             const summaryOutput = document.getElementById('summary-output');
-            const transcriptionOutput = document.getElementById('transcription-output');
-            
+            const transcriptionBox = document.getElementById('transcription-output');
+            const audioForm = document.getElementById('audio-form');
+            const ocrForm = document.getElementById('ocr-form');
+            const loader = document.getElementById('loader');
+            const placeholder = document.getElementById('placeholder');
+            const resultsContainer = document.getElementById('results-container');
+            const adhdToolkit = document.getElementById('adhd-toolkit');
+
             function loadNotes() { notes = JSON.parse(localStorage.getItem('accessai_notes')) || []; renderDashboard(); }
             function saveNotes() { localStorage.setItem('accessai_notes', JSON.stringify(notes)); }
 
@@ -172,10 +227,13 @@
                 if (!note) return;
                 currentNote = note;
                 summaryOutput.innerHTML = formatSummary(note.summary);
-                transcriptionOutput.innerHTML = `<h4>Full Transcription</h4><p>${note.transcription}</p>`;
-                document.getElementById('placeholder').style.display = 'none';
-                document.getElementById('results-container').classList.add('active');
+                transcriptionBox.querySelector('h4').textContent = note.transcription_title || 'Full Transcription';
+                transcriptionBox.querySelector('.transcription-content').textContent = note.transcription;
+                placeholder.style.display = 'none';
+                resultsContainer.classList.add('active');
                 document.getElementById('save-note-btn').style.display = 'none';
+                adhdToolkit.style.display = 'none';
+                adhdData = null;
             }
 
             document.getElementById('save-note-btn').addEventListener('click', () => {
@@ -209,6 +267,13 @@
             document.getElementById('dyslexia-font-toggle').addEventListener('change', e => document.body.classList.toggle('dyslexia-font', e.target.checked));
             document.getElementById('highlight-toggle').addEventListener('change', e => mainContent.classList.toggle('highlight-active', e.target.checked));
             
+            const readingRuler = document.getElementById('reading-ruler');
+            document.getElementById('reading-ruler-toggle').addEventListener('change', e => mainContent.classList.toggle('ruler-active', e.target.checked));
+            mainContent.addEventListener('mousemove', e => {
+                const rect = mainContent.getBoundingClientRect();
+                readingRuler.style.top = `${e.clientY - rect.top}px`;
+            });
+
             const overlay = document.getElementById('reading-overlay');
             const overlayBtns = document.querySelectorAll('.overlay-btn');
             overlayBtns.forEach(btn => {
@@ -226,37 +291,165 @@
                 });
             });
 
-            const audioForm = document.getElementById('audio-form');
-            const loader = document.getElementById('loader');
-            const placeholder = document.getElementById('placeholder');
-            const resultsContainer = document.getElementById('results-container');
-            audioForm.addEventListener('submit', async function(event) {
-                event.preventDefault();
+            async function handleFormSubmit(url, formData) {
                 placeholder.style.display = 'none';
                 resultsContainer.classList.remove('active');
+                adhdToolkit.style.display = 'none';
+                adhdData = null;
                 loader.style.display = 'block';
+
                 try {
-                    const response = await fetch('/upload-audio', { method: 'POST', body: new FormData(audioForm) });
+                    const response = await fetch(url, { method: 'POST', body: formData });
                     if (!response.ok) throw new Error((await response.json()).error || 'Unknown error');
                     const data = await response.json();
-                    currentNote = { summary: data.summary, transcription: data.transcription };
-                    summaryOutput.innerHTML = formatSummary(data.summary);
-                    transcriptionOutput.innerHTML = `<h4>Full Transcription</h4><p>${data.transcription}</p>`;
+
+                    if (url === '/upload-audio') {
+                        currentNote = { summary: data.summary, transcription: data.transcription, transcription_title: 'Full Transcription' };
+                    } else {
+                        currentNote = { summary: data.simplified_text, transcription: data.extracted_text, transcription_title: 'Original Extracted Text' };
+                    }
+                    
+                    summaryOutput.innerHTML = formatSummary(currentNote.summary);
+                    transcriptionBox.querySelector('h4').textContent = currentNote.transcription_title;
+                    transcriptionBox.querySelector('.transcription-content').textContent = currentNote.transcription;
                     resultsContainer.classList.add('active');
                     document.getElementById('save-note-btn').style.display = 'inline-block';
+
+                    if (document.getElementById('adhd-mode-toggle').checked) {
+                        await fetchAndRenderAdhdTools(currentNote.summary);
+                    }
                 } catch (error) {
                     alert('Error: ' + error.message);
-                    placeholder.style.display = 'block';
                 } finally {
                     loader.style.display = 'none';
                 }
+            }
+
+            audioForm.addEventListener('submit', (e) => { e.preventDefault(); handleFormSubmit('/upload-audio', new FormData(audioForm)); });
+            ocrForm.addEventListener('submit', (e) => { e.preventDefault(); handleFormSubmit('/upload-image', new FormData(ocrForm)); });
+
+            async function fetchAndRenderAdhdTools(summary) {
+                const loader = document.getElementById('adhd-loader');
+                const content = document.getElementById('adhd-content');
+                adhdToolkit.style.display = 'block';
+                loader.style.display = 'block';
+                content.style.display = 'none';
+
+                try {
+                    const response = await fetch('/generate-adhd-tools', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ summary })
+                    });
+                    if (!response.ok) throw new Error('Failed to generate ADHD tools.');
+                    adhdData = await response.json();
+                    
+                    adhdData.originalExplanation = summary;
+                    renderAdhdToolkit(adhdData);
+                    content.style.display = 'block';
+                } catch (error) {
+                    adhdToolkit.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                } finally {
+                    loader.style.display = 'none';
+                }
+            }
+
+            function renderAdhdToolkit(data) {
+                const explainButtons = document.getElementById('explain-buttons');
+                explainButtons.innerHTML = '<button class="secondary-btn" data-type="simple">Explain Simply</button><button class="secondary-btn active" data-type="original">Original</button><button class="secondary-btn" data-type="deep">Explain Deeply</button>';
+                
+                const conceptMapDiv = document.getElementById('concept-map-output');
+                conceptMapDiv.textContent = data.conceptMap;
+                conceptMapDiv.removeAttribute('data-processed');
+                try {
+                    mermaid.initialize({ startOnLoad: false, theme: document.body.classList.contains('high-contrast') ? 'dark' : 'default' });
+                    mermaid.run({ nodes: [conceptMapDiv] });
+                } catch (e) {
+                    console.error("Mermaid syntax error:", e);
+                    conceptMapDiv.innerHTML = `<p style="color: red; text-align: center;">Could not generate a valid concept map.</p>`;
+                }
+                
+                const dynamicDiagramSection = document.getElementById('dynamic-diagram-section');
+                const dynamicDiagramDiv = document.getElementById('dynamic-diagram-output');
+                if (data.dynamicDiagram && data.dynamicDiagram.diagramType !== 'none') {
+                    dynamicDiagramDiv.textContent = data.dynamicDiagram.diagramCode;
+                    dynamicDiagramDiv.removeAttribute('data-processed');
+                    try {
+                        mermaid.run({ nodes: [dynamicDiagramDiv] });
+                        dynamicDiagramSection.style.display = 'block';
+                    } catch (e) {
+                        dynamicDiagramSection.style.display = 'none';
+                    }
+                } else {
+                    dynamicDiagramSection.style.display = 'none';
+                }
+
+                const conceptualGraphSection = document.getElementById('conceptual-graph-section');
+                const conceptualGraphDiv = document.getElementById('conceptual-graph-output');
+                if(data.conceptualGraph && data.conceptualGraph.svgCode) {
+                    conceptualGraphSection.querySelector('h4').textContent = data.conceptualGraph.title;
+                    conceptualGraphDiv.innerHTML = data.conceptualGraph.svgCode;
+                    conceptualGraphSection.style.display = 'block';
+                } else {
+                    conceptualGraphSection.style.display = 'none';
+                }
+
+                document.getElementById('mnemonics-output').innerHTML = data.mnemonics.map(item => `<div class="mnemonic-card"><strong>${item.term}:</strong> ${item.mnemonic}</div>`).join('');
+                document.getElementById('quiz-output').innerHTML = data.quiz.map((item, index) => `
+                    <div class="quiz-item">
+                        <p>${index + 1}. ${item.question.replace(/___/g, '<strong>___</strong>')}</p>
+                        <button class="secondary-btn" onclick="this.nextElementSibling.style.display='block'">Show Answer</button>
+                        <p class="answer">${item.answer}</p>
+                    </div>
+                `).join('');
+            }
+
+            // THE FIX: Attach listener to the parent container that never gets destroyed.
+            adhdToolkit.addEventListener('click', (e) => {
+                // Check if the clicked element is one of the explain buttons
+                if (e.target.matches('#explain-buttons button')) {
+                    if (adhdData) {
+                        const type = e.target.dataset.type;
+                        let textToDisplay = adhdData.originalExplanation;
+                        if (type === 'simple') textToDisplay = adhdData.simpleExplanation;
+                        else if (type === 'deep') textToDisplay = adhdData.deepExplanation;
+                        
+                        summaryOutput.innerHTML = formatSummary(textToDisplay);
+                        
+                        document.querySelectorAll('#explain-buttons button').forEach(b => b.classList.remove('active'));
+                        e.target.classList.add('active');
+                    }
+                }
+                 // Check for the read aloud button
+                if (e.target.id === 'read-aloud-btn') {
+                    const text = summaryOutput.innerText;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    if (speechSynthesis.speaking) { speechSynthesis.cancel(); } 
+                    else { speechSynthesis.speak(utterance); }
+                }
+            });
+            
+            document.getElementById('adhd-mode-toggle').addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                if (isChecked) {
+                    if (currentNote && !adhdData) {
+                        fetchAndRenderAdhdTools(currentNote.summary);
+                    } else if (adhdData) {
+                        adhdToolkit.style.display = 'block';
+                    }
+                } else {
+                    adhdToolkit.style.display = 'none';
+                }
+            });
+
+            document.getElementById('toggle-transcription-btn').addEventListener('click', (e) => {
+                const content = transcriptionBox.querySelector('.transcription-content');
+                const isHidden = content.classList.toggle('hidden');
+                e.target.textContent = isHidden ? 'Show Transcription' : 'Hide Transcription';
             });
 
             function formatSummary(markdownText) {
-                // THE FIX: This regex correctly handles both `_highlight_..._highlight_` and the simpler `_..._`
-                let html = markdownText.replace(/_highlight_([\s\S]*?)_highlight_|_([^_]+)_/g, (match, group1, group2) => {
-                    return `<span class="highlight">${group1 || group2}</span>`;
-                });
+                let html = markdownText.replace(/_highlight_([\s\S]*?)_highlight_/g, '<span class="highlight">$1</span>');
                 html = html.replace(/\*\*(.*?):\*\*/g, '<h3>$1</h3>');
                 html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
                 html = html.replace(/(\<li\>.*?\<\/li\>)/gs, '<ul>$1</ul>');
@@ -268,54 +461,5 @@
             loadNotes();
         });
     </script>
-
-<h1>Upload Image for Simplified Text</h1>
-<form id="image-form">
-    <label for="image-file">Select an image:</label>
-    <input type="file" id="image-file" name="image" accept="image/*" required>
-
-    <label>
-        <input type="checkbox" id="read-aloud" name="read_aloud">
-        Read simplified text out loud
-    </label>
-
-    <button type="submit">Upload and Simplify</button>
-</form>
-
-<div id="image-results" style="display: none;">
-    <h2>Extracted Text</h2>
-    <div id="extracted-text"></div>
-    <h2>Simplified Text</h2>
-    <div id="simplified-text"></div>
-</div>
-
-<script>
-document.getElementById('image-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const fileInput = document.getElementById('image-file');
-    const readAloud = document.getElementById('read-aloud').checked;
-    const imageFile = fileInput.files[0];
-
-    const formData = new FormData();
-    formData.append('image', imageFile);
-    formData.append('read_aloud', readAloud);  // pass checkbox value
-
-    try {
-        const response = await fetch('/upload-image', {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-        document.getElementById('extracted-text').innerText = data.extracted_text;
-        document.getElementById('simplified-text').innerText = data.simplified_text;
-        document.getElementById('image-results').style.display = 'block';
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-});
-</script>
-
 </body>
 </html>
