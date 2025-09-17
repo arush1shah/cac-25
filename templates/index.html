@@ -78,6 +78,54 @@
         
         .formatted-summary { font-size: var(--reading-font-size); line-height: var(--reading-line-height); letter-spacing: var(--reading-letter-spacing); word-spacing: var(--reading-word-spacing); text-align: var(--reading-text-align); }
         .formatted-summary h3 { font-size: 1.8rem; color: var(--primary-color); }
+        /* Calming Sounds Specific Styles */
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .sound-btn {
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .sound-btn:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .sound-btn.playing {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+        .sound-btn svg {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 8px;
+            stroke-width: 1.5;
+        }
+        .sound-btn.playing svg {
+            color: #fff;
+        }
         .transcription-box { margin-top: 2rem; border: 1px solid var(--border-color); border-radius: 12px; }
         .transcription-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); }
         .transcription-content { padding: 1.5rem; white-space: pre-wrap; line-height: 1.6; }
@@ -104,6 +152,28 @@
         <button class="nav-link active" data-module="dashboard" title="Dashboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
         <button class="nav-link" data-module="transcribe" title="Transcribe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
         <button class="nav-link" data-module="simplify" title="Simplify"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg></button>
+        <button class="nav-link" data-module="pomodoro" title="Pomodoro Timer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+            </svg>
+        </button>
+        <button class="nav-link" data-module="fidget-tools" title="Fidget Tools">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8" cy="8" r="2"></circle>
+                <circle cx="16" cy="8" r="2"></circle>
+                <circle cx="8" cy="16" r="2"></circle>
+                <circle cx="16" cy="16" r="2"></circle>
+            </svg>
+        </button>
+         <button class="nav-link" data-module="calming-sounds" title="Calming Sounds">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" class="feather feather-music">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+        </button>
         <div class="spacer"></div>
         <button class="nav-link" data-module="settings" title="Settings"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
     </nav>
@@ -123,11 +193,632 @@
         </div>
         <div id="simplify-module" class="module">
              <h2>Scan & Simplify Image</h2>
-             <form id="ocr-form">
+             <form id="ocr-form" action="/image/upload-image" method="POST" enctype="multipart/form-data">
                 <label for="image-file">Upload Image:</label><input type="file" id="image-file" name="image" accept="image/*" required>
                 <button type="submit" class="primary-btn">Scan Image</button>
             </form>
+            {% if audio_file %}
+    <h3>Audio Playback:</h3>
+    <audio controls>
+        <source src="/uploads/{{ audio_file }}" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+{% endif %}
+<script src="{{ url_for('static', filename='js/audio-controls.js') }}"></script>
+
         </div>
+        <div id="pomodoro-module" class="module">
+            <h2>Pomodoro Timer</h2>
+        
+            <!-- 25-Minute Timer -->
+            <div id="timer-25">
+                <h3>25-Minute Timer</h3>
+                <div id="timer-display-25">
+                    <h1 id="time-25">25:00</h1>
+                </div>
+                <div id="timer-controls-25">
+                    <button id="start-timer-25" class="primary-btn">Start</button>
+                    <button id="pause-timer-25" class="secondary-btn">Pause</button>
+                    <button id="reset-timer-25" class="secondary-btn">Reset</button>
+                </div>
+            </div>
+        
+            <!-- 5-Minute Timer -->
+            <div id="timer-5">
+                <h3>5-Minute Timer</h3>
+                <div id="timer-display-5">
+                    <h1 id="time-5">5:00</h1>
+                </div>
+                <div id="timer-controls-5">
+                    <button id="start-timer-5" class="primary-btn">Start</button>
+                    <button id="pause-timer-5" class="secondary-btn">Pause</button>
+                    <button id="reset-timer-5" class="secondary-btn">Reset</button>
+                </div>
+            </div>
+        </div>
+        <script>
+            // 25-Minute Timer Logic
+            let timer25;
+            let timeLeft25 = 25 * 60; // 25 minutes in seconds
+            let isRunning25 = false;
+        
+            const timeDisplay25 = document.getElementById('time-25');
+            const startButton25 = document.getElementById('start-timer-25');
+            const pauseButton25 = document.getElementById('pause-timer-25');
+            const resetButton25 = document.getElementById('reset-timer-25');
+        
+            function updateDisplay25() {
+                const minutes = Math.floor(timeLeft25 / 60);
+                const seconds = timeLeft25 % 60;
+                timeDisplay25.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        
+            startButton25.addEventListener('click', () => {
+                if (!isRunning25) {
+                    isRunning25 = true;
+                    timer25 = setInterval(() => {
+                        if (timeLeft25 > 0) {
+                            timeLeft25--;
+                            updateDisplay25();
+                        } else {
+                            clearInterval(timer25);
+                            isRunning25 = false;
+                            alert('25-Minute Timer Finished!');
+                        }
+                    }, 1000);
+                }
+            });
+        
+            pauseButton25.addEventListener('click', () => {
+                clearInterval(timer25);
+                isRunning25 = false;
+            });
+        
+            resetButton25.addEventListener('click', () => {
+                clearInterval(timer25);
+                isRunning25 = false;
+                timeLeft25 = 25 * 60;
+                updateDisplay25();
+            });
+        
+            updateDisplay25();
+        
+            // 5-Minute Timer Logic
+            let timer5;
+            let timeLeft5 = 5 * 60; // 5 minutes in seconds
+            let isRunning5 = false;
+        
+            const timeDisplay5 = document.getElementById('time-5');
+            const startButton5 = document.getElementById('start-timer-5');
+            const pauseButton5 = document.getElementById('pause-timer-5');
+            const resetButton5 = document.getElementById('reset-timer-5');
+        
+            function updateDisplay5() {
+                const minutes = Math.floor(timeLeft5 / 60);
+                const seconds = timeLeft5 % 60;
+                timeDisplay5.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        
+            startButton5.addEventListener('click', () => {
+                if (!isRunning5) {
+                    isRunning5 = true;
+                    timer5 = setInterval(() => {
+                        if (timeLeft5 > 0) {
+                            timeLeft5--;
+                            updateDisplay5();
+                        } else {
+                            clearInterval(timer5);
+                            isRunning5 = false;
+                            alert('5-Minute Timer Finished!');
+                        }
+                    }, 1000);
+                }
+            });
+        
+            pauseButton5.addEventListener('click', () => {
+                clearInterval(timer5);
+                isRunning5 = false;
+            });
+        
+            resetButton5.addEventListener('click', () => {
+                clearInterval(timer5);
+                isRunning5 = false;
+                timeLeft5 = 5 * 60;
+                updateDisplay5();
+            });
+        
+            updateDisplay5();
+        </script>
+        <style>
+            /* Pomodoro Timer Styles */
+            #pomodoro-timer {
+                padding: 20px;
+                text-align: center;
+            }
+        
+            #pomodoro-timer h2 {
+                font-family: var(--font-serif);
+                font-size: 1.8rem;
+                color: var(--primary-color);
+                margin-bottom: 20px;
+            }
+        
+            /* Backdrop for the timers */
+            .timer-backdrop {
+                background: linear-gradient(135deg, #f0f0f0, #e0e0e0); /* Subtle gradient */
+                border-radius: 20px;
+                padding: 30px;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+                max-width: 700px;
+                margin: 0 auto;
+            }
+        
+            .timer-container {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+            }
+        
+            .timer {
+                flex: 1;
+                background-color: var(--secondary-color);
+                border-radius: 10px;
+                padding: 15px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+        
+            .timer h3 {
+                font-family: var(--font-serif);
+                font-size: 1.2rem;
+                color: var(--text-color);
+                margin-bottom: 10px;
+            }
+        
+            .timer-display {
+                background-color: var(--panel-bg);
+                border: 2px solid var(--border-color);
+                border-radius: 10px;
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+        
+            .timer-display h1 {
+                font-family: var(--font-main);
+                font-size: 2.5rem;
+                color: var(--primary-color);
+                margin: 0;
+            }
+        
+            .timer-controls {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+            }
+        
+            .primary-btn, .secondary-btn {
+                font-family: var(--font-main);
+                font-size: 1rem;
+                padding: 10px 15px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.2s ease, color 0.2s ease;
+            }
+        
+            .primary-btn {
+                background-color: var(--primary-color);
+                color: #fff;
+            }
+        
+            .primary-btn:hover {
+                background-color: #d94e04;
+            }
+        
+            .secondary-btn {
+                background-color: var(--border-color);
+                color: var(--text-color);
+            }
+        
+            .secondary-btn:hover {
+                background-color: var(--text-muted);
+                color: #fff;
+            }
+        </style>
+        
+            
+        </div>
+
+        <div id="fidget-tools-module" class="module">
+            <h2>Fidget Tools</h2>
+            <div>
+                <!-- Dot Disappearing Game -->
+                <h3>Dot Disappearing Game</h3>
+                <div id="dot-container">
+                </div>
+                <button id="reset-dots" class="primary-btn">Reset Dots</button>
+            </div>
+            <div>
+                <h3>Pop It Fidget Tool</h3>
+            
+                <div id="orange-square">
+                    <div id="pop-it-container">
+                    </div>
+                </div>
+                <button id="reset-pop-it" class="primary-btn" style="margin-top: 20px; text-align: left;">Reset Pop It</button>
+            </div>
+            <div>
+                <h3>Fidget Spinner</h3>
+                <div id="fidget-spinner-container">
+                    <div id="fidget-spinner-body"></div>
+                    <div id="center-bearing" class="spinner-bearing"></div>
+                </div>
+            </div>
+
+        </div>
+        <div id="calming-sounds-module" class="module">
+            <h2>Calming Sounds</h2>
+            <p>Select a sound to play. Click again to pause.</p>
+            <div class="sound-grid">
+            <!-- Beta Waves -->
+            <button class="sound-btn" data-sound="/static/sounds/betawaves.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-beta-waves">
+                    <path d="M2 12c1-4 3 4 5 0s4-4 6 0 4 4 6 0 4-4 5 0"></path>
+                </svg>
+                Beta Waves
+            </button>
+            <!-- Alpha Waves -->
+            <button class="sound-btn" data-sound="/static/sounds/alphawaves.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alpha-waves">
+                    <path d="M2 12c2-2 6 2 8 0s6-2 8 0 6-2 8 0"></path>
+                </svg>
+                Alpha Waves
+            </button>
+             <!-- Rain -->
+            <button class="sound-btn" data-sound="/static/sounds/rain.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-cloud-rain">
+                    <!-- Slightly smaller cloud shape -->
+                    <path d="M7 15a3 3 0 0 1 0-6 4 4 0 0 1 7-3 5 5 0 0 1 7 3 3 3 0 0 1-1 6H7z"></path>
+                    <!-- Raindrops -->
+                    <line x1="8" y1="19" x2="8" y2="21"></line>
+                    <line x1="12" y1="19" x2="12" y2="21"></line>
+                    <line x1="16" y1="19" x2="16" y2="21"></line>
+                </svg>
+                Rain
+            </button>
+            <!-- Ocean Waves -->
+            <button class="sound-btn" data-sound="/static/sounds/ocean.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-waves">
+                    <path d="M3 16s4-2 7 0 7-2 7 0 7-2 7 0"></path>
+                    <path d="M3 20s4-2 7 0 7-2 7 0 7-2 7 0"></path>
+                </svg>
+                Ocean Waves
+            </button>
+
+            <!-- Forest Ambient -->
+            <button class="sound-btn" data-sound="/static/sounds/forest.mp3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tree">
+                    <path d="M12 2L5 14h14L12 2z"></path> 
+                    <rect x="11" y="14" width="2" height="6"></rect> 
+                </svg>
+                Forest Ambient
+            </button>
+
+                <!-- Fire -->
+                <button class="sound-btn" data-sound="/static/sounds/fire.mp3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-fire">
+                        <path d="M12 2C10 6 14 8 12 12c-2-4-6-4-6 0a6 6 0 0 0 12 0c0-4-4-4-6-10z"></path>
+                    </svg>
+                    Fire
+                </button>
+                <!-- Wind -->
+                <button class="sound-btn" data-sound="/static/sounds/wind.mp3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-wind">
+                        <path d="M3 12c2-2 6-2 8 0s6 2 8 0"></path>
+                        <path d="M5 16c1.5-1.5 4.5-1.5 6 0s4.5 1.5 6 0"></path>
+                        <path d="M7 8c1-1 3-1 4 0s3 1 4 0"></path>
+                    </svg>
+                    Wind
+                </button>
+                
+                <button class="sound-btn" data-sound="/static/sounds/river.mp3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-droplet">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0z"></path>
+                    </svg>
+                    Flowing River
+                </button>
+            </div>
+            <p class="fun-fact">
+                <strong>Fun Fact:</strong> Beta waves help people with ADHD improve alertness, concentration, and thinking. Alpha waves, on the other hand, help with meditation, creativity, and relaxation.
+            </p>
+        </div>
+        </div>
+        </div>
+        
+        <style>
+            /* Dot Disappearing Game */
+            #dot-container {
+                display: grid;
+                grid-template-columns: repeat(10, 1fr); 
+                gap: 10px;
+                justify-content: center;
+                margin: 20px auto;
+                max-width: 400px;
+            }
+        
+            .dot {
+                width: 20px;
+                height: 20px;
+                background-color: #ffd1a3;
+                border-radius: 50%;
+                transition: opacity 0.2s ease;
+                cursor: pointer;
+            }
+        
+            .dot.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+        </style>
+        
+        <script>
+            // Dot Disappearing Game Logic
+            const dotContainer = document.getElementById('dot-container');
+            const resetButton = document.getElementById('reset-dots');
+        
+            function generateDots() {
+                dotContainer.innerHTML = ''; // clear existing dots
+                for (let i = 0; i < 100; i++) { // create 100 dots
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    dot.addEventListener('mouseover', () => {
+                        dot.classList.add('hidden'); // hide dot on hover
+                        checkAllDotsGone(); // check if all dots are gone
+                    });
+                    dotContainer.appendChild(dot);
+                }
+            }
+        
+            // Function to check if all dots are gone
+            function checkAllDotsGone() {
+                const remainingDots = document.querySelectorAll('.dot:not(.hidden)');
+            }
+        
+            // Reset button functionality
+            resetButton.addEventListener('click', generateDots);
+        
+            // Initialize the game
+            generateDots();
+        </script>
+<style>
+    #orange-square {
+        position: relative; 
+        width: 350px; 
+        height: 350px; 
+        background-color: #FAD6A5; 
+        margin: 20px auto; 
+        border: 2px solid #E5A96E; 
+        border-radius: 10px; 
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Pop It Bubbles */
+    #pop-it-container {
+        position: absolute; 
+        top: 50%;
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); 
+        gap: 10px; 
+        justify-content: center;
+    }
+
+    .pop-it-bubble {
+        width: 40px; 
+        height: 40px; 
+        background-color: #FFC04D; 
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s, box-shadow 0.2s, background-color 0.2s;
+    }
+
+    .pop-it-bubble.popped {
+        background-color: #FFB347; 
+        transform: translateY(4px); 
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3); 
+        pointer-events: none; 
+    }
+
+    /* Reset Button */
+    #reset-pop-it {
+        display: block;
+        margin: 20px 0 0; 
+        text-align: left; 
+    }
+</style>
+
+<script>
+    // Pop It Fidget Tool Logic
+    const popItContainer = document.getElementById('pop-it-container');
+    const resetPopItButton = document.getElementById('reset-pop-it');
+
+    // Function to generate Pop It bubbles
+    function generatePopIt() {
+        popItContainer.innerHTML = ''; // clear existing bubbles
+        for (let i = 0; i < 36; i++) { // create 36 bubbles
+            const bubble = document.createElement('div');
+            bubble.classList.add('pop-it-bubble');
+            bubble.addEventListener('click', () => {
+                bubble.classList.add('popped'); // mark bubble as popped
+            });
+            popItContainer.appendChild(bubble);
+        }
+    }
+
+    // reset button functionality for pop it
+    resetPopItButton.addEventListener('click', generatePopIt);
+
+    // initialize the pop it tool
+    generatePopIt();
+</script>
+
+<style>
+    #fidget-spinner-container {
+        width: 300px; 
+        height: 300px;
+        margin: 40px auto;
+        position: relative; 
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+        background-color: transparent; 
+        box-shadow: 0 5px 15px rgba(0,0,0,0.25); 
+        border-radius: 50%; 
+    }
+
+    /* this is the actual spinner body*/
+    #fidget-spinner-body {
+        position: absolute;
+        width: 100%; 
+        height: 100%;
+        background-color: transparent; 
+        z-index: 5; 
+        transform-origin: center center;
+        transition: transform 0.1s linear;
+
+        clip-path: polygon(
+            50% 0%,        
+            60% 5%,        
+            60% 40%,       
+            90% 40%,       
+            95% 50%,       
+            90% 60%,       
+            60% 60%,       
+            60% 95%,      
+            50% 100%,      
+            40% 95%,       
+            40% 60%,       
+            10% 60%,       
+            5% 50%,        
+            10% 40%,       
+            40% 40%,       
+            40% 5%         
+        );
+        background-color: #FFA500; 
+        border-radius: 50%; 
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.3), 0 5px 15px rgba(0,0,0,0.2); 
+    }
+
+    .spinner-bearing {
+        position: absolute; 
+        background-color: #bbbbbb; 
+        border-radius: 50%;
+        box-shadow: inset 0 0 8px rgba(0,0,0,0.4), 0 2px 5px rgba(0,0,0,0.15); 
+        display: flex; 
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #999; 
+        z-index: 15; 
+    }
+
+    #center-bearing {
+        width: 65px; 
+        height: 65px;
+        background-color: #555; 
+        cursor: pointer; 
+        z-index: 20; 
+        border: 3px solid #333; 
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.6), 0 3px 8px rgba(0,0,0,0.2); 
+    }
+</style>
+
+<script>
+    const spinnerContainer = document.getElementById('fidget-spinner-container');
+    const spinnerBody = document.getElementById('fidget-spinner-body');
+    const centerBearing = document.getElementById('center-bearing');
+
+    let currentRotation = 0;
+    let spinVelocity = 0; 
+    const MAX_SPIN_VELOCITY = 20; 
+    const ACCELERATION_RATE = 1; 
+    const DECELERATION_RATE = 0.98; 
+    let isSpinningUp = false; 
+
+    let animationFrameId;
+
+    function animateSpin() {
+        if (isSpinningUp) {
+            // accelerate up to MAX_SPIN_VELOCITY
+            spinVelocity = Math.min(MAX_SPIN_VELOCITY, spinVelocity + ACCELERATION_RATE);
+        } else {
+            // decelerate when not clicking
+            spinVelocity *= DECELERATION_RATE;
+            // stop completely if velocity is very low
+            if (spinVelocity < 0.1) {
+                spinVelocity = 0;
+            }
+        }
+
+        if (spinVelocity > 0) {
+            currentRotation += spinVelocity;
+            spinnerBody.style.transform = `rotate(${currentRotation}deg)`; 
+            animationFrameId = requestAnimationFrame(animateSpin);
+        } else {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null; 
+        }
+    }
+
+    centerBearing.addEventListener('mousedown', () => {
+        isSpinningUp = true;
+        if (!animationFrameId) {
+            animateSpin();
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isSpinningUp = false;
+    });
+
+    centerBearing.addEventListener('touchstart', (e) => {
+        e.preventDefault(); 
+        isSpinningUp = true;
+        if (!animationFrameId) {
+            animateSpin();
+        }
+    });
+
+    document.addEventListener('touchend', () => {
+        isSpinningUp = false;
+    });
+</script>
+<script>
+    const soundButtons = document.querySelectorAll('.sound-btn');
+    let currentAudio = null;
+
+    soundButtons.forEach((button) => {
+        const audio = new Audio(button.getAttribute('data-sound'));
+        audio.loop = true; 
+
+        button.addEventListener('click', () => {
+            if (currentAudio && currentAudio !== audio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            if (audio.paused) {
+                audio.play(); 
+                currentAudio = audio; 
+            } else {
+                audio.pause();
+                currentAudio = null;
+            }
+        });
+    });
+</script>
+
+        
         <div id="settings-module" class="module">
             <h2>Settings</h2>
             <div class="setting-group"><h4>Learning Modes</h4>
@@ -186,6 +877,32 @@
                 </div>
                 <div class="transcription-content"></div>
             </div>
+        </div>
+        <div id="welcome-area">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            {% if extracted_text %}
+                <h3>Extracted Text:</h3>
+                <p>{{ extracted_text }}</p>
+            {% endif %}
+            {% if simplified_text %}
+                <h3>Simplified Text:</h3>
+                <p>{{ simplified_text }}</p>
+            {% endif %}
+        </div>
+        <div id="welcome-area">
+            {% if error %}
+                <p style="color: red;">{{ error }}</p>
+            {% endif %}
+            {% if extracted_text %}
+                <h3>Extracted Text:</h3>
+                <p>{{ extracted_text }}</p>
+            {% endif %}
+            {% if simplified_text %}
+                <h3>Simplified Text:</h3>
+                <p>{{ simplified_text }}</p>
+            {% endif %}
         </div>
     </main>
 
@@ -461,5 +1178,54 @@
             loadNotes();
         });
     </script>
+
+<h1>Upload Image for Simplified Text</h1>
+<form id="image-form">
+    <label for="image-file">Select an image:</label>
+    <input type="file" id="image-file" name="image" accept="image/*" required>
+
+    <label>
+        <input type="checkbox" id="read-aloud" name="read_aloud">
+        Read simplified text out loud
+    </label>
+
+    <button type="submit">Upload and Simplify</button>
+</form>
+
+<div id="image-results" style="display: none;">
+    <h2>Extracted Text</h2>
+    <div id="extracted-text"></div>
+    <h2>Simplified Text</h2>
+    <div id="simplified-text"></div>
+</div>
+
+<script>
+document.getElementById('image-form').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById('image-file');
+    const readAloud = document.getElementById('read-aloud').checked;
+    const imageFile = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    formData.append('read_aloud', readAloud);  // pass checkbox value
+
+    try {
+        const response = await fetch('/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        document.getElementById('extracted-text').innerText = data.extracted_text;
+        document.getElementById('simplified-text').innerText = data.simplified_text;
+        document.getElementById('image-results').style.display = 'block';
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
+});
+</script>
+
 </body>
 </html>

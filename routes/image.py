@@ -1,11 +1,27 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file, render_template
 from PIL import Image
 import pytesseract
 import os
 from openai import OpenAI
-from utils.tts import speak_text  # <-- import your TTS function
+import traceback
+from utils.tts import speak_text_to_file  # <-- import your TTS function
 
 image_bp = Blueprint('image', __name__)
+
+@image_bp.route('/get-audio', methods=['POST'])
+def get_audio():
+    data = request.get_json()
+    simplified_text = data.get('simplified_text', '')
+
+    if not simplified_text:
+        return jsonify({'error': 'No text provided'}), 400
+
+    # Generate audio file
+    audio_file = 'output_audio.wav'
+    speak_text_to_file(simplified_text, audio_file)
+
+    # Serve the audio file
+    return send_file(audio_file, as_attachment=True)
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -23,29 +39,48 @@ def simplify_text(text):
 
 @image_bp.route('/upload-image', methods=['POST'])
 def upload_image():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image file'}), 400
+    try:
+        # Check for file
+        if 'image' not in request.files:
+            return render_template('index.html', error='No image file uploaded.')
 
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+        file = request.files['image']
+        if file.filename == '':
+            return render_template('index.html', error='No file selected.')
 
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(filepath)
+        # Save file temporarily
+        filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(filepath)
 
-    image = Image.open(filepath)
-    extracted_text = pytesseract.image_to_string(image)
-    simplified_text_result = simplify_text(extracted_text)
+        # Extract text from the image
+        image = Image.open(filepath)
+        extracted_text = pytesseract.image_to_string(image)
 
-    # Optional TTS
-    read_aloud = request.form.get('read_aloud', 'false').lower() == 'true'
-    if read_aloud:
-        speak_text(simplified_text_result)
+        # Simplify the extracted text
+        simplified_text_result = simplify_text(extracted_text)
 
-    os.remove(filepath)  # cleanup
+         # Generate audio file from simplified text
+        audio_file_name = 'simplified_audio.wav'
+        audio_file = os.path.join('uploads', audio_file_name)  # Full path for saving
+        speak_text_to_file(simplified_text_result, audio_file)
 
-    return jsonify({
-        'extracted_text': extracted_text,
-        'simplified_text': simplified_text_result,
-        'read_aloud': read_aloud
-    })
+
+        # Cleanup the uploaded file
+        try:
+            os.remove(filepath)
+        except Exception as remove_error:
+            print("Error removing file:", remove_error)
+
+        # Render the template with the extracted and simplified text
+        return render_template(
+            'index.html',
+            extracted_text=extracted_text,
+            simplified_text=simplified_text_result,
+            audio_file=audio_file_name
+        )
+
+    except Exception as e:
+        # Handle unexpected errors
+        print("Unexpected error in upload_image:", e)
+        traceback.print_exc()
+        return render_template('index.html', error='An error occurred while processing the image.')
