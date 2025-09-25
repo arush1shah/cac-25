@@ -10,7 +10,7 @@ from flask import Flask, send_from_directory
 
 app = Flask(__name__)
 app.register_blueprint(audio_bp)
-app.register_blueprint(image_bp , url_prefix='/image')
+app.register_blueprint(image_bp)
 
 
 @app.route('/fidget-tools')

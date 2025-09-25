@@ -72,12 +72,17 @@ def upload_image():
             print("Error removing file:", remove_error)
 
         # Render the template with the extracted and simplified text
+        '''
         return render_template(
             'index.html',
             extracted_text=extracted_text,
             simplified_text=simplified_text_result,
             audio_file=audio_file_name
-        )
+        )'''
+        return jsonify({
+        'extracted_text': extracted_text,
+        'simplified_text': simplified_text_result
+})
 
     except Exception as e:
         # Handle unexpected errors
