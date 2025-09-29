@@ -453,6 +453,13 @@
                     <div id="center-bearing" class="spinner-bearing"></div>
                 </div>
             </div>
+            <div>
+                <h3>Blow Bubbles</h3>
+                <button id="blow-bubbles-btn" class="primary-btn">Blow Bubbles</button>
+                <div id="bubble-container" style="position: relative; width: 100%; height: 300px; overflow: hidden; border: 1px solid var(--border-color); border-radius: 8px; margin-top: 15px; background-color: #e0f2f7;">
+                    <!-- Bubbles will be injected here -->
+                </div>
+            </div>
 
         </div>
         <div id="calming-sounds-module" class="module">
@@ -793,6 +800,181 @@
         isSpinningUp = false;
     });
 </script>
+<style>
+/* Fidget Tools - Blow Bubbles */
+#bubble-container {
+    background: linear-gradient(to bottom, #e0f2f7, #c1e7f3); /* Light blue background */
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.bubble {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(173, 216, 230, 0.6); /* Light blue, semi-transparent */
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.8); /* White border for highlight */
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5), 0 0 5px rgba(173, 216, 230, 0.7);
+    animation: floatUp 10s infinite linear; /* Animation for floating */
+    cursor: pointer;
+    opacity: 0; /* Start hidden */
+    transition: transform 0.1s ease-out, opacity 0.3s ease-out;
+}
+
+.bubble.pop {
+    transform: scale(1.5);
+    opacity: 0;
+    transition: transform 0.1s ease-out, opacity 0.1s ease-out;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100%); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100%); opacity: 0; }
+}
+</style>
+
+<script>
+    // ... existing fidget tool scripts ...
+
+    // Blow Bubbles Fidget Tool Logic
+    const blowBubblesBtn = document.getElementById('blow-bubbles-btn');
+    const bubbleContainer = document.getElementById('bubble-container');
+
+    let bubbleGenerationInterval; // Interval for creating new bubbles
+    let isBlowingBubbles = false;
+
+    function createBubble() {
+        const bubble = document.createElement('div');
+        bubble.classList.add('bubble');
+
+        // Random size for variety (now from 20px to 60px)
+        const size = Math.floor(Math.random() * (60 - 20) + 20);
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+
+        // Random starting horizontal position (within container width)
+        const startX = Math.random() * (bubbleContainer.offsetWidth - size);
+        bubble.style.left = `${startX}px`;
+
+        // Random starting vertical position (within container height, adjusted for bubble size)
+        // This makes bubbles appear throughout the square, not just from the bottom
+        const startY = Math.random() * (bubbleContainer.offsetHeight - size);
+        bubble.style.top = `${startY}px`;
+
+        // Random animation duration for variety (between 8 and 15 seconds)
+        const duration = Math.random() * (15 - 8) + 8;
+        bubble.style.animationDuration = `${duration}s`;
+        
+        // No animation delay needed with the new full-square appearance logic
+        // We will control appearance/disappearance more directly
+
+        // Set initial opacity to 1 immediately so they are visible from the start
+        // and add a slight fade-in transition if desired (handled by CSS transition if not popped)
+        bubble.style.opacity = 1;
+
+
+        bubbleContainer.appendChild(bubble);
+
+        // --- NEW Floating Logic for "throughout the square" ---
+        // Instead of a simple `floatUp` animation from 0% to 100% translateY,
+        // we'll now use JS to animate a full float.
+        // We'll calculate a target X and Y for a gentle drift.
+        const targetX = Math.random() * (bubbleContainer.offsetWidth - size);
+        const targetY = Math.random() * (bubbleContainer.offsetHeight - size); // Drifting within the square
+
+        // Define a function to animate the bubble
+        const animateSingleBubble = () => {
+            let currentX = parseFloat(bubble.style.left);
+            let currentY = parseFloat(bubble.style.top);
+
+            const speed = 0.5; // Controls how fast they drift
+
+            // Calculate new position towards the target
+            currentX += (targetX - currentX) * (speed / 100);
+            currentY += (targetY - currentY) * (speed / 100);
+
+            bubble.style.left = `${currentX}px`;
+            bubble.style.top = `${currentY}px`;
+
+            // If bubble is not popped and still in container, continue animation
+            if (!bubble.classList.contains('popped') && bubble.parentNode === bubbleContainer) {
+                // If close to target, pick a new target for continuous drift
+                if (Math.abs(targetX - currentX) < 5 && Math.abs(targetY - currentY) < 5) {
+                    bubble.dataset.targetX = Math.random() * (bubbleContainer.offsetWidth - size);
+                    bubble.dataset.targetY = Math.random() * (bubbleContainer.offsetHeight - size);
+                }
+                requestAnimationFrame(animateSingleBubble);
+            } else {
+                 // Clean up if the bubble is popped or removed
+                 bubble.remove();
+            }
+        };
+
+        // Start the animation for this bubble
+        bubble.dataset.targetX = targetX; // Store target for continuous drifting
+        bubble.dataset.targetY = targetY;
+        requestAnimationFrame(animateSingleBubble);
+
+
+        // Pop sound (optional, requires an audio file)
+        // const popSound = new Audio('/static/sounds/pop.mp3'); // You'd need a sound file here
+
+        bubble.addEventListener('click', () => {
+            if (bubble.classList.contains('popped')) return; // Prevent multiple pops
+
+            bubble.classList.add('popped'); // Apply the pop effect
+
+            // if (popSound) { popSound.play(); } // Play pop sound
+
+            // Remove the bubble *after* its pop transition finishes
+            bubble.addEventListener('transitionend', () => {
+                if (bubble.parentNode === bubbleContainer) { // Check if it's still in the container
+                    bubble.remove();
+                }
+            });
+
+            // Stop any ongoing animation frame for this specific bubble's float
+            // (The animateSingleBubble function naturally stops if 'popped' class is present)
+        });
+    }
+
+    blowBubblesBtn.addEventListener('click', () => {
+        if (!isBlowingBubbles) {
+            // Start blowing bubbles
+            isBlowingBubbles = true;
+            blowBubblesBtn.textContent = "Stop Bubbles";
+            // Start generating new bubbles
+            bubbleGenerationInterval = setInterval(createBubble, 500);
+        } else {
+            // Stop blowing bubbles
+            isBlowingBubbles = false;
+            blowBubblesBtn.textContent = "Blow Bubbles";
+            // Stop generating new bubbles
+            clearInterval(bubbleGenerationInterval);
+
+            // Immediately remove all existing bubbles from the container
+            const currentBubbles = bubbleContainer.querySelectorAll('.bubble');
+            currentBubbles.forEach(b => {
+                // To ensure transitionend for 'popped' still fires if they were clicked
+                if (!b.classList.contains('popped')) {
+                    b.classList.add('popped'); // Make them pop away
+                    b.addEventListener('transitionend', () => b.remove());
+                } else {
+                    b.remove(); // If already popped or being removed, just remove
+                }
+            });
+        }
+    });
+
+    // Initial bubbles on load, if desired
+    // for (let i = 0; i < 5; i++) {
+    //     createBubble();
+    // }
+</script>
+
+
 <script>
     const soundButtons = document.querySelectorAll('.sound-btn');
     let currentAudio = null;
@@ -1179,18 +1361,6 @@
         });
     </script>
 
-<h1>Upload Image for Simplified Text</h1>
-<form id="image-form">
-    <label for="image-file">Select an image:</label>
-    <input type="file" id="image-file" name="image" accept="image/*" required>
-
-    <label>
-        <input type="checkbox" id="read-aloud" name="read_aloud">
-        Read simplified text out loud
-    </label>
-
-    <button type="submit">Upload and Simplify</button>
-</form>
 
 <div id="image-results" style="display: none;">
     <h2>Extracted Text</h2>
