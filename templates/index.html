@@ -1391,6 +1391,17 @@ document.getElementById('image-form').addEventListener('submit', async function(
         document.getElementById('extracted-text').innerText = data.extracted_text;
         document.getElementById('simplified-text').innerText = data.simplified_text;
         document.getElementById('image-results').style.display = 'block';
+               // ✅ ALSO set currentNote so ADHD toolkit can use it
+        currentNote = {
+            summary: data.simplified_text,
+            transcription: data.extracted_text,
+            transcription_title: "Original Extracted Text"
+        };
+
+        // ✅ If ADHD mode is enabled, trigger toolkit
+        if (document.getElementById('adhd-mode-toggle').checked) {
+            await fetchAndRenderAdhdTools(currentNote.summary);
+        }
     } catch (err) {
         alert("Error: " + err.message);
     }

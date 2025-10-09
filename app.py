@@ -11,6 +11,7 @@ from flask import Flask, send_from_directory
 app = Flask(__name__)
 app.register_blueprint(audio_bp)
 app.register_blueprint(image_bp)
+app.register_blueprint(adhd_tools_bp)
 
 
 @app.route('/fidget-tools')

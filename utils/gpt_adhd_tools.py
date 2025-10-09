@@ -3,6 +3,7 @@
 import openai
 import os
 import json
+import traceback
 
 client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -57,4 +58,5 @@ def generate_adhd_tools(summary_text):
         return learning_aids
     except Exception as e:
         print(f"Error generating ADHD tools: {e}")
+        traceback.print_exc() 
         return {"error": "Failed to generate learning aids.", "details": str(e)}
