@@ -1304,29 +1304,41 @@
             }
 
             // THE FIX: Attach listener to the parent container that never gets destroyed.
-            adhdToolkit.addEventListener('click', (e) => {
-                // Check if the clicked element is one of the explain buttons
+            adhdToolkit.addEventListener('click', async (e) => {                
                 if (e.target.matches('#explain-buttons button')) {
-                    if (adhdData) {
-                        const type = e.target.dataset.type;
-                        let textToDisplay = adhdData.originalExplanation;
-                        if (type === 'simple') textToDisplay = adhdData.simpleExplanation;
-                        else if (type === 'deep') textToDisplay = adhdData.deepExplanation;
-                        
-                        summaryOutput.innerHTML = formatSummary(textToDisplay);
-                        
-                        document.querySelectorAll('#explain-buttons button').forEach(b => b.classList.remove('active'));
-                        e.target.classList.add('active');
+                    const type = e.target.dataset.type;
+                    if (!adhdData && currentNote?.summary) {
+                        try {
+                            await fetchAndRenderAdhdTools(currentNote.summary);
+                        } catch (err) {
+                            console.error('Failed to fetch ADHD tools:', err);
+                            alert('Could not load explanations. Please try again.');
+                            return;
                     }
                 }
-                 // Check for the read aloud button
-                if (e.target.id === 'read-aloud-btn') {
-                    const text = summaryOutput.innerText;
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    if (speechSynthesis.speaking) { speechSynthesis.cancel(); } 
-                    else { speechSynthesis.speak(utterance); }
+
+                // If we still don’t have data, stop
+                if (!adhdData) return;
+                // Choose which explanation to display
+                let textToDisplay = currentNote.summary; // default to original
+                if (type === 'simple') textToDisplay = adhdData.simpleExplanation;
+                else if (type === 'deep') textToDisplay = adhdData.deepExplanation;
+
+                // Update the summary display
+                summaryOutput.innerHTML = formatSummary(textToDisplay);
+
+                // Update active button styling
+                document.querySelectorAll('#explain-buttons button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
                 }
-            });
+            // Check for the read aloud button
+            if (e.target.id === 'read-aloud-btn') {
+                const text = summaryOutput.innerText;
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (speechSynthesis.speaking) { speechSynthesis.cancel(); } 
+                else { speechSynthesis.speak(utterance); }
+            }
+        });
             
             document.getElementById('adhd-mode-toggle').addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
@@ -1356,9 +1368,8 @@
                 html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 return html;
             }
-            
-            loadNotes();
         });
+            loadNotes();
     </script>
 
 
@@ -1400,8 +1411,18 @@ document.getElementById('image-form').addEventListener('submit', async function(
 
         // ✅ If ADHD mode is enabled, trigger toolkit
         if (document.getElementById('adhd-mode-toggle').checked) {
-            await fetchAndRenderAdhdTools(currentNote.summary);
+            // Make sure we actually have something to analyze
+            const summaryText = currentNote.summary?.trim();
+            if (summaryText && summaryText.length > 20) {
+                await fetchAndRenderAdhdTools(summaryText);
+            } else if (currentNote.transcription?.trim()) {
+                // fallback: use extracted text if simplified summary is empty
+                await fetchAndRenderAdhdTools(currentNote.transcription);
+            } else {
+                console.warn("No valid summary or text found for ADHD tools.");
+            }
         }
+
     } catch (err) {
         alert("Error: " + err.message);
     }
