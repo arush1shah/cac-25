@@ -64,6 +64,30 @@
         .main-content.highlight-active .highlight { background-color: #ffdd00; color: #000; padding: 2px 4px; border-radius: 4px; }
         body.high-contrast .main-content.highlight-active .highlight { background-color: #00ffff; }
         .placeholder { text-align: center; color: var(--text-muted); margin-top: 10rem; }
+        .placeholder {
+            display: flex;
+            flex-direction: column; 
+            align-items: center;   
+            text-align: center; 
+            color: var(--text-muted); 
+            margin-top: 8rem;
+        }
+
+        .placeholder h2 {
+            font-size: 2.5rem; 
+            margin-bottom: 0.75rem; 
+        }
+
+        .placeholder p {
+            font-size: 1.2rem; 
+            margin-top: 0; 
+            color: var(--text-muted); 
+        }
+
+        .placeholder-notebook-icon {
+            width: 220px; 
+            margin-top: 0.5rem; /* REDUCED: This moves the icon higher up */
+        }
         .results-container.active { display: block; }
         .results-container { display: none; }
         #reading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; display: none; pointer-events: none; }
@@ -76,7 +100,7 @@
         .secondary-btn { background: none; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; }
         .secondary-btn.active, .secondary-btn:hover { background: var(--secondary-color); border-color: var(--primary-color); }
         
-        .formatted-summary { font-size: var(--reading-font-size); line-height: var(--reading-line-height); letter-spacing: var(--reading-letter-spacing); word-spacing: var(--reading-word-spacing); text-align: var(--reading-text-align); }
+        .formatted-summary {font-size: var(--reading-font-size); line-height: var(--reading-line-height); letter-spacing: var(--reading-letter-spacing); word-spacing: var(--reading-word-spacing); text-align: var(--reading-text-align); }
         .formatted-summary h3 { font-size: 1.8rem; color: var(--primary-color); }
         /* Calming Sounds Specific Styles */
         .sound-grid {
@@ -209,30 +233,32 @@
         </div>
         <div id="pomodoro-module" class="module">
             <h2>Pomodoro Timer</h2>
-        
-            <!-- 25-Minute Timer -->
-            <div id="timer-25">
-                <h3>25-Minute Timer</h3>
-                <div id="timer-display-25">
-                    <h1 id="time-25">25:00</h1>
+            
+            <div class="pomodoro-wrapper">
+                <!-- Focus Timer Card -->
+                <div class="timer-container" id="timer-25">
+                    <h3>Focus</h3>
+                    <div class="timer-backdrop">
+                        <h1 id="time-25">25:00</h1>
+                    </div>
+                    <div class="timer-controls" id="timer-controls-25">
+                        <button id="start-timer-25" class="primary-btn">Start</button>
+                        <button id="pause-timer-25" class="secondary-btn">Pause</button>
+                        <button id="reset-timer-25" class="secondary-btn">Reset</button>
+                    </div>
                 </div>
-                <div id="timer-controls-25">
-                    <button id="start-timer-25" class="primary-btn">Start</button>
-                    <button id="pause-timer-25" class="secondary-btn">Pause</button>
-                    <button id="reset-timer-25" class="secondary-btn">Reset</button>
-                </div>
-            </div>
-        
-            <!-- 5-Minute Timer -->
-            <div id="timer-5">
-                <h3>5-Minute Timer</h3>
-                <div id="timer-display-5">
-                    <h1 id="time-5">5:00</h1>
-                </div>
-                <div id="timer-controls-5">
-                    <button id="start-timer-5" class="primary-btn">Start</button>
-                    <button id="pause-timer-5" class="secondary-btn">Pause</button>
-                    <button id="reset-timer-5" class="secondary-btn">Reset</button>
+
+                <!-- Break Timer Card -->
+                <div class="timer-container" id="timer-5">
+                    <h3>Break</h3>
+                    <div class="timer-backdrop">
+                        <h1 id="time-5">5:00</h1>
+                    </div>
+                    <div class="timer-controls" id="timer-controls-5">
+                        <button id="start-timer-5" class="primary-btn">Start</button>
+                        <button id="pause-timer-5" class="secondary-btn">Pause</button>
+                        <button id="reset-timer-5" class="secondary-btn">Reset</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,99 +356,66 @@
             updateDisplay5();
         </script>
         <style>
-            /* Pomodoro Timer Styles */
-            #pomodoro-timer {
-                padding: 20px;
-                text-align: center;
-            }
-        
-            #pomodoro-timer h2 {
-                font-family: var(--font-serif);
-                font-size: 1.8rem;
-                color: var(--primary-color);
-                margin-bottom: 20px;
-            }
-        
-            /* Backdrop for the timers */
-            .timer-backdrop {
-                background: linear-gradient(135deg, #f0f0f0, #e0e0e0); /* Subtle gradient */
-                border-radius: 20px;
-                padding: 30px;
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
-                max-width: 700px;
-                margin: 0 auto;
-            }
-        
-            .timer-container {
-                display: flex;
-                justify-content: space-between;
-                gap: 20px;
-            }
-        
-            .timer {
-                flex: 1;
-                background-color: var(--secondary-color);
-                border-radius: 10px;
-                padding: 15px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            }
-        
-            .timer h3 {
-                font-family: var(--font-serif);
-                font-size: 1.2rem;
-                color: var(--text-color);
-                margin-bottom: 10px;
-            }
-        
-            .timer-display {
-                background-color: var(--panel-bg);
-                border: 2px solid var(--border-color);
-                border-radius: 10px;
-                padding: 20px;
-                margin-bottom: 15px;
-            }
-        
-            .timer-display h1 {
-                font-family: var(--font-main);
-                font-size: 2.5rem;
-                color: var(--primary-color);
-                margin: 0;
-            }
-        
-            .timer-controls {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-            }
-        
-            .primary-btn, .secondary-btn {
-                font-family: var(--font-main);
-                font-size: 1rem;
-                padding: 10px 15px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: background-color 0.2s ease, color 0.2s ease;
-            }
-        
-            .primary-btn {
-                background-color: var(--primary-color);
-                color: #fff;
-            }
-        
-            .primary-btn:hover {
-                background-color: #d94e04;
-            }
-        
-            .secondary-btn {
-                background-color: var(--border-color);
-                color: var(--text-color);
-            }
-        
-            .secondary-btn:hover {
-                background-color: var(--text-muted);
-                color: #fff;
-            }
+            .pomodoro-wrapper {
+            /* This new class wraps both timers and adds space between them */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; 
+        }
+
+        .timer-container {
+            /* This creates the main "card" for each timer */
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px; /* A softer, more modern corner radius */
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* A subtle shadow for depth */
+            transition: all 0.2s ease-in-out;
+        }
+
+        .timer-container:hover {
+            /* Makes the card lift up slightly when you hover over it */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.07);
+            transform: translateY(-3px);
+        }
+
+        .timer-container h3 {
+            font-family: var(--font-main); 
+            font-size: 1.6rem;
+            font-weight: 600; 
+            color: var(--text-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px; /* Optional: Adds a little breathing room between letters */
+}
+
+        .timer-backdrop {
+            /* This creates the beautiful background for the time display */
+            background: linear-gradient(145deg, var(--secondary-color), #ffffff);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); /* A very subtle inner shadow */
+        }
+
+        .timer-backdrop h1 {
+            /* Makes the time (e.g., "25:00") large and prominent */
+            font-family: var(--font-main);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0;
+            line-height: 1; /* Ensures tight vertical spacing */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05); /* Adds a subtle text shadow */
+        }
+
+        .timer-controls {
+            /* Styles the container for the Start/Pause/Reset buttons */
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem; /* Adds space between the buttons */
+        }
         </style>
         
             
@@ -803,7 +796,7 @@
 <style>
 /* Fidget Tools - Blow Bubbles */
 #bubble-container {
-    background: linear-gradient(to bottom, #e0f2f7, #c1e7f3); /* Light blue background */
+    background: linear-gradient(to bottom,  #ffd587,  #ffd382); 
     box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
 }
 
@@ -811,13 +804,13 @@
     position: absolute;
     width: 30px;
     height: 30px;
-    background-color: rgba(173, 216, 230, 0.6); /* Light blue, semi-transparent */
+    background-color: rgba(239, 170, 97, 0.6); 
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.8); /* White border for highlight */
-    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5), 0 0 5px rgba(173, 216, 230, 0.7);
-    animation: floatUp 10s infinite linear; /* Animation for floating */
+    border: 1px solid rgba(255, 255, 255, 0.8); 
+    box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.5), 0 0 5px rgba(244, 207, 121, 0.7);
+    animation: floatUp 10s infinite linear; 
     cursor: pointer;
-    opacity: 0; /* Start hidden */
+    opacity: 0; 
     transition: transform 0.1s ease-out, opacity 0.3s ease-out;
 }
 
@@ -836,7 +829,7 @@
 </style>
 
 <script>
-    // ... existing fidget tool scripts ...
+  
 
     // Blow Bubbles Fidget Tool Logic
     const blowBubblesBtn = document.getElementById('blow-bubbles-btn');
@@ -1032,7 +1025,31 @@
 
     <main class="main-content" id="main-content">
         <div id="reading-ruler"></div>
-        <div class="placeholder" id="placeholder"><h2>Welcome to AccessAI</h2><p>Upload a file or select a saved note.</p></div>
+        <div class="placeholder" id="placeholder">
+            <!-- Text comes first -->
+            <h2>Welcome to AccessAI</h2>
+            <p>Upload a file or select a saved note.</p>
+        
+            <!-- Icon is now UNDER the text -->
+            <div class="placeholder-notebook-icon">
+                <svg viewBox="0 0 125 125" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Transparent SVG Code -->
+                    <g transform="translate(10, 10)">
+                        <g stroke="#d18a6a" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M25,5 H90 A5,5 0 0 1 95,10 V90 A5,5 0 0 1 90,95 H25 Z" />
+                            <path d="M22,18 C18,18 18,22 22,22 M22,30 C18,30 18,34 22,34 M22,42 C18,42 18,46 22,46 M22,54 C18,54 18,58 22,58 M22,66 C18,66 18,70 22,70 M22,78 C18,78 18,82 22,82 M22,90 C18,90 18,94 22,94" />
+                        </g>
+                        <g fill="#e4b59b">
+                            <rect x="35" y="20" width="16" height="12" rx="3" />
+                            <rect x="56" y="24" width="30" height="4" rx="2" />
+                            <rect x="35" y="42" width="50" height="4" rx="2" />
+                            <rect x="35" y="58" width="50" height="4" rx="2" />
+                            <rect x="35" y="74" width="50" height="4" rx="2" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+        </div>
         <div id="loader" style="display: none;">Processing...</div>
         <div class="results-container" id="results-container">
             <button id="save-note-btn" class="primary-btn" style="margin-bottom: 1rem;">Save to Dashboard</button>
