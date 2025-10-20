@@ -1053,6 +1053,7 @@
         <div class="results-container" id="results-container">
             <button id="save-note-btn" class="primary-btn" style="margin-bottom: 1rem;">Save to Dashboard</button>
             <div id="summary-output" class="formatted-summary"></div>
+            <div id="audio-player-container" style="margin-top: 1.5rem;"></div>
             <div class="adhd-toolkit" id="adhd-toolkit">
                 <div id="adhd-loader" style="display: none;">Building your toolkit...</div>
                 <div id="adhd-content" style="display: none;">
@@ -1212,6 +1213,9 @@
                 adhdData = null;
                 loader.style.display = 'block';
 
+                const audioContainer = document.getElementById('audio-player-container');
+                audioContainer.innerHTML = ''; // Clear any previous player
+
                 try {
                     const response = await fetch(url, { method: 'POST', body: formData });
                     if (!response.ok) throw new Error((await response.json()).error || 'Unknown error');
@@ -1228,6 +1232,17 @@
                     transcriptionBox.querySelector('.transcription-content').textContent = currentNote.transcription;
                     resultsContainer.classList.add('active');
                     document.getElementById('save-note-btn').style.display = 'inline-block';
+
+                    if (data.audio_file) {
+                        const audioPlayerHTML = `
+                            <h3>Audio Playback:</h3>
+                            <audio controls style="width: 100%;">
+                                <source src="/uploads/${data.audio_file}" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        `;
+                        audioContainer.innerHTML = audioPlayerHTML;
+                    }
 
                     if (document.getElementById('adhd-mode-toggle').checked) {
                         // Make sure we actually have something to analyze
