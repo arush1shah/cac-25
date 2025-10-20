@@ -24,7 +24,7 @@ def generate_adhd_tools(summary_text):
     - EXAMPLE: `graph TD; A["Main Idea"] --> B["Key Concept"]; B --> C["Definition"];`
 
     1.  "simpleExplanation": Rewrite the summary in very simple, direct language, as if explaining it to a 5th grader. Display in bullet points with many line breaks for easier reading. Please use metaphors or analogies to make complex ideas more relatable.
-    2.  "deepExplanation": Rewrite the summary with more detail, connecting it to broader concepts or providing deeper context. Display in bullet points with many line breaks and go deep into the concepts so it is like the student never missed the lesson. Underneath each key term discussed in the lesson, include subpoints breaking it down into more detail.
+    2.  "deepExplanation": Rewrite the summary with more detail, connecting it to broader concepts or providing deeper context. Display in bullet points with many line breaks and go deep into the concepts so it is like the student never missed the lesson. Underneath each key term discussed in the lesson, include subpoints breaking it down into more detail. Make sure the subpoints have line breaks too.
     3.  "conceptMap": A concept map in Mermaid.js 'graph TD' syntax, visually connecting the main ideas.
     4.  "mnemonics": An array of objects, each with "term" and "mnemonic" keys (a rhyme, acronym, etc.). Create a song or a rhyme that explains the key terms in a way easy to remember.
     5.  "quiz": An array of objects, each with "question" (a fill-in-the-blanks question) and "answer" keys.

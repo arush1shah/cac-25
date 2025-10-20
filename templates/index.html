@@ -1344,41 +1344,48 @@
             }
 
             // THE FIX: Attach listener to the parent container that never gets destroyed.
-            adhdToolkit.addEventListener('click', async (e) => {                
-                if (e.target.matches('#explain-buttons button')) {
-                    const type = e.target.dataset.type;
-                    if (!adhdData && currentNote?.summary) {
-                        try {
-                            await fetchAndRenderAdhdTools(currentNote.summary);
-                        } catch (err) {
-                            console.error('Failed to fetch ADHD tools:', err);
-                            alert('Could not load explanations. Please try again.');
-                            return;
-                    }
-                }
+            // ADHD Toolkit Explain & Read-Aloud Handlers
+(function() {
+    const attachListeners = () => {
+        const explainButtonsContainer = document.getElementById('explain-buttons');
+        const summaryOutput = document.getElementById('summary-output');
+        const readAloudBtn = document.getElementById('read-aloud-btn');
 
-                // If we still don’t have data, stop
-                if (!adhdData) return;
-                // Choose which explanation to display
-                let textToDisplay = currentNote.summary; // default to original
+        if (explainButtonsContainer) {
+            explainButtonsContainer.addEventListener('click', (e) => {
+                if (!e.target.matches('button')) return;
+                if (typeof adhdData === 'undefined' || !adhdData || !currentNote) return;
+
+                const type = e.target.dataset.type;
+                let textToDisplay = currentNote.summary;
                 if (type === 'simple') textToDisplay = adhdData.simpleExplanation;
                 else if (type === 'deep') textToDisplay = adhdData.deepExplanation;
 
-                // Update the summary display
                 summaryOutput.innerHTML = formatSummary(textToDisplay);
 
-                // Update active button styling
-                document.querySelectorAll('#explain-buttons button').forEach(b => b.classList.remove('active'));
+                explainButtonsContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                }
-            // Check for the read aloud button
-            if (e.target.id === 'read-aloud-btn') {
+            });
+        }
+
+        if (readAloudBtn) {
+            readAloudBtn.addEventListener('click', () => {
+                if (!summaryOutput) return;
                 const text = summaryOutput.innerText;
+                if (!text) return;
+
                 const utterance = new SpeechSynthesisUtterance(text);
-                if (speechSynthesis.speaking) { speechSynthesis.cancel(); } 
-                else { speechSynthesis.speak(utterance); }
-            }
-        });
+                if (speechSynthesis.speaking) speechSynthesis.cancel();
+                else speechSynthesis.speak(utterance);
+            });
+        }
+    };
+
+    // Attach immediately and also after a small delay in case elements are dynamically rendered
+    attachListeners();
+    setTimeout(attachListeners, 500);
+})();
+
             
             document.getElementById('adhd-mode-toggle').addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
@@ -1469,80 +1476,95 @@ document.getElementById('image-form').addEventListener('submit', async function(
 });
 </script>
 <script>
-    window.addEventListener("load", async () => {
-      const summarySection = document.getElementById("summary-output");
-      const cameraToggle = document.getElementById("camera-toggle");
-      if (!summarySection) return;
-    
-      const glowOn = () => {
+ window.addEventListener("load", async () => {
+    const summarySection = document.getElementById("summary-output");
+    const cameraToggle = document.getElementById("camera-toggle");
+    if (!summarySection) return;
+
+    // --- Glow functions ---
+    const glowOn = () => {
         summarySection.style.boxShadow = "0 0 40px 10px rgba(255, 215, 0, 0.6)";
-      };
-      const glowOff = () => {
+    };
+    const glowOff = () => {
         summarySection.style.boxShadow = "none";
-      };
-    
-      // --- Camera setup ---
-      const video = document.createElement("video");
-      video.autoplay = true;
-      video.playsInline = true;
-      video.style.position = "fixed";
-      video.style.bottom = "10px";
-      video.style.right = "10px";
-      video.style.width = "240px";
-      video.style.height = "180px";
-      video.style.border = "3px solid #e85d04";
-      video.style.borderRadius = "8px";
-      video.style.zIndex = "9999";
-      video.style.display = "none";
-      document.body.appendChild(video);
-    
-      let stream;
-      try {
+    };
+
+    // --- Camera setup ---
+    const video = document.createElement("video");
+    video.autoplay = true;
+    video.playsInline = true;
+    video.style.position = "fixed";
+    video.style.bottom = "10px";
+    video.style.right = "10px";
+    video.style.width = "240px";
+    video.style.height = "180px";
+    video.style.border = "3px solid #e85d04";
+    video.style.borderRadius = "8px";
+    video.style.zIndex = "9999";
+    video.style.display = "none";
+    document.body.appendChild(video);
+
+    // Camera toggle (optional)
+    if (cameraToggle) {
+        cameraToggle.addEventListener("change", (e) => {
+            video.style.display = e.target.checked ? "block" : "none";
+        });
+    }
+
+    // --- Load camera stream ---
+    let stream;
+    try {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
-      } catch (err) {
+    } catch (err) {
         console.error("Camera access denied:", err);
         return;
-      }
-    
-      // --- Camera toggle ---
-      cameraToggle.addEventListener("change", (e) => {
-        video.style.display = e.target.checked ? "block" : "none";
-      });
-    
-      // --- Load BlazeFace model ---
-      const model = await blazeface.load();
-      console.log("✅ BlazeFace model loaded");
-    
-      let lastSeen = Date.now();
-      let attentionLost = false;
-      const ATTENTION_TIMEOUT = 5000; // 5 seconds
-    
-      async function detectFace() {
-        if (video.readyState < 2) return;
-    
-        const predictions = await model.estimateFaces(video, false);
-        const now = Date.now();
-    
-        if (predictions.length > 0) {
-          // Face detected
-          lastSeen = now;
-          if (attentionLost) {
-            glowOff();
-            attentionLost = false;
-          }
-        } else if (now - lastSeen > ATTENTION_TIMEOUT && !attentionLost) {
-          // Face not detected for too long
-          console.log("⚠️ Attention drift detected!");
-          glowOn();
-          attentionLost = true;
+    }
+
+    // --- Load BlazeFace model ---
+    await tf.ready();
+    const model = await blazeface.load();
+    console.log("✅ BlazeFace model loaded");
+
+    // --- Attention logic ---
+    let lastSeen = Date.now();
+    let attentionLost = false;
+    const ATTENTION_TIMEOUT = 5000; // 5 seconds
+
+    async function detectFace() {
+        try {
+            if (!video.srcObject) return;
+
+            const predictions = await model.estimateFaces(video, false);
+            const now = Date.now();
+
+            if (predictions.length > 0) {
+                // Face detected → reset timer
+                lastSeen = now;
+
+                // Remove glow if it was on
+                if (attentionLost) {
+                    glowOff();
+                    attentionLost = false;
+                }
+            } else {
+                // Face not detected → check timeout
+                if (now - lastSeen > ATTENTION_TIMEOUT && !attentionLost) {
+                    console.log("⚠️ Attention drift detected!");
+                    glowOn();
+                    attentionLost = true;
+                }
+            }
+
+            requestAnimationFrame(detectFace);
+        } catch (err) {
+            console.error("Face detection error:", err);
+            requestAnimationFrame(detectFace);
         }
-    
-        requestAnimationFrame(detectFace);
-      }
-    
-      detectFace();
-    });
-    </script>    
+    }
+
+    detectFace();
+});
+</script>
 </body>
 </html>
