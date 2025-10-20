@@ -24,14 +24,16 @@ def generate_adhd_tools(summary_text):
     - EXAMPLE: `graph TD; A["Main Idea"] --> B["Key Concept"]; B --> C["Definition"];`
 
     1.  "simpleExplanation": Rewrite the summary in very simple, direct language, as if explaining it to a 5th grader. Display in bullet points with many line breaks for easier reading. Please use metaphors or analogies to make complex ideas more relatable.
-    2.  "deepExplanation": Rewrite the summary with more detail, connecting it to broader concepts or providing deeper context. Display in bullet points with many line breaks and go deep into the concepts so it is like the student never missed the lesson.
+    2.  "deepExplanation": Rewrite the summary with more detail, connecting it to broader concepts or providing deeper context. Display in bullet points with many line breaks and go deep into the concepts so it is like the student never missed the lesson. Underneath each key term discussed in the lesson, include subpoints breaking it down into more detail.
     3.  "conceptMap": A concept map in Mermaid.js 'graph TD' syntax, visually connecting the main ideas.
     4.  "mnemonics": An array of objects, each with "term" and "mnemonic" keys (a rhyme, acronym, etc.). Create a song or a rhyme that explains the key terms in a way easy to remember.
     5.  "quiz": An array of objects, each with "question" (a fill-in-the-blanks question) and "answer" keys.
     6. "dynamicDiagram": An object with two keys: "diagramType" and "diagramCode".
         - Analyze the summary. If a specific part of it is well-suited for a visual explanation, choose an appropriate diagram.
         - If it compares/contrasts concepts, set "diagramType" to "Venn Diagram" and provide Mermaid 'vennDiagram' syntax in "diagramCode". For example if you are going over 3 types of related concepts, show their overlaps and differences.
-        - If it describes a process or flow, set "diagramType" to "Flowchart" and provide Mermaid 'graph TD' syntax in "diagramCode".
+        - If it describes a cause and effect, set "diagramType" to "Flowchart" and provide Mermaid 'graph TD' syntax in "diagramCode".
+        - ONLY include if there are meaningful branching relationships between ideas.
+        - If the summary is purely sequential (a process, list, or step-by-step description), then set "conceptMap" to an empty string ("").
         - If NO specific diagram would be genuinely helpful, set "diagramType" to "none" and "diagramCode" to an empty string.
         - The "diagramCode" MUST contain ONLY valid Mermaid syntax, no extra text.
     7. "conceptualGraph": 
