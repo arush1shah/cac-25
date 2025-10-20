@@ -81,6 +81,10 @@ def upload_image():
             return jsonify({'error': 'No image file uploaded.'}), 400
 
         file = request.files['image']
+        if file.filename.lower().endswith('.heic'):
+            print("⚠️ HEIC images are not supported yet.")
+            return jsonify({'error': 'HEIC images are not supported. Please upload a JPG or PNG file instead.'}), 400
+
         if file.filename == '':
             return jsonify({'error': 'No file selected.'}), 400
 

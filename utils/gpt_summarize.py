@@ -37,7 +37,7 @@ def summarize_text(text, language='en'):
     Start with a short, easy-to-understand paragraph explaining the overall topic of the lecture.
 
     **2. Key Concepts & Explanations:**
-    List the main concepts discussed in bullet points. For each concept, provide a simple explanation that is detailed enough for a student to understand. Define all important terms, using your own knowledge if necessary. Crucially, **you must include the professor's helpful analogies and informal terms (like 'doomed space' or 'death space')**, as they are key to understanding the material.
+   Break down the lecture into structured notes (bullet points or traditional main idea notes), focusing on key topics and terms. For each concept, provide a simple explanation that is detailed enough for a student to understand. Define all important terms, using your own knowledge if necessary. Crucially, **you must include the professor's helpful analogies and informal terms (like 'doomed space' or 'death space')**, as they are key to understanding the material.
 
     **3. How It All Connects:**
     Explain how the different concepts build on each other. For example, how do the simple 2D rotations relate to the more complex 3D and 4D ones? Why are these rotation matrices important for things like computer graphics or data science?

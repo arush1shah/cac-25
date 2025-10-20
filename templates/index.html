@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AccessAI Dashboard</title>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.7/dist/blazeface.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&family=Lora:wght@400;500&display=swap');
@@ -167,12 +169,17 @@
         .mnemonic-card strong { color: var(--primary-color); }
         .conceptual-graph-container { text-align: center; }
         .conceptual-graph-container svg { max-width: 100%; height: auto; }
+
+    /* Smooth glow animation for attention indicator */
+        #summary-output {
+            transition: box-shadow 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body>
     <div id="reading-overlay"></div>
     <nav class="nav-sidebar">
-        <div class="nav-logo">A</div>
+        <div class="nav-logo">Z</div>
         <button class="nav-link active" data-module="dashboard" title="Dashboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></button>
         <button class="nav-link" data-module="transcribe" title="Transcribe"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
         <button class="nav-link" data-module="simplify" title="Simplify"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg></button>
@@ -1010,6 +1017,15 @@
                 <div class="setting-item"><label for="letter-spacing">Letter Spacing</label><input type="range" id="letter-spacing" min="0" max="2" step="0.1" value="0"></div>
                 <div class="setting-item"><label for="word-spacing">Word Spacing</label><input type="range" id="word-spacing" min="0" max="5" step="0.25" value="0"></div>
             </div>
+            <div class="setting-group"><h4>Attention Monitor</h4>
+                <div class="setting-item">
+                  <label>Show Camera View</label>
+                  <label class="switch">
+                    <input type="checkbox" id="camera-toggle">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+            </div>              
             <div class="setting-group"><h4>Reading Aids</h4>
                 <div class="setting-item"><label>Reading Ruler</label><label class="switch"><input type="checkbox" id="reading-ruler-toggle"><span class="slider"></span></label></div>
                 <div class="setting-item"><label>Reading Overlays</label>
@@ -1027,8 +1043,8 @@
         <div id="reading-ruler"></div>
         <div class="placeholder" id="placeholder">
             <!-- Text comes first -->
-            <h2>Welcome to AccessAI</h2>
-            <p>Upload a file or select a saved note.</p>
+            <h2>Welcome to ZAP!</h2>
+            <p>Focus. Learn. Thrive.</p>
         
             <!-- Icon is now UNDER the text -->
             <div class="placeholder-notebook-icon">
@@ -1105,7 +1121,6 @@
             {% endif %}
         </div>
     </main>
-
     <script>
         mermaid.initialize({ startOnLoad: false });
         document.addEventListener('DOMContentLoaded', () => {
@@ -1120,8 +1135,8 @@
             const resultsContainer = document.getElementById('results-container');
             const adhdToolkit = document.getElementById('adhd-toolkit');
 
-            function loadNotes() { notes = JSON.parse(localStorage.getItem('accessai_notes')) || []; renderDashboard(); }
-            function saveNotes() { localStorage.setItem('accessai_notes', JSON.stringify(notes)); }
+            function loadNotes() { notes = JSON.parse(localStorage.getItem('zap_notes')) || []; renderDashboard(); }
+            function saveNotes() { localStorage.setItem('zap_notes', JSON.stringify(notes)); }
 
             function renderDashboard() {
                 const noteList = document.getElementById('note-list');
@@ -1247,8 +1262,18 @@
                     }
 
                     if (document.getElementById('adhd-mode-toggle').checked) {
-                        await fetchAndRenderAdhdTools(currentNote.summary);
+                        // Make sure we actually have something to analyze
+                        const summaryText = currentNote.summary?.trim();
+                        if (summaryText && summaryText.length > 20) {
+                            await fetchAndRenderAdhdTools(summaryText);
+                        } else if (currentNote.transcription?.trim()) {
+                            // fallback: use extracted text if simplified summary is empty
+                            await fetchAndRenderAdhdTools(currentNote.transcription);
+                        } else {
+                            console.warn("No valid summary or text found for ADHD tools.");
+                        }
                     }
+
                 } catch (error) {
                     alert('Error: ' + error.message);
                 } finally {
@@ -1460,6 +1485,81 @@ document.getElementById('image-form').addEventListener('submit', async function(
     }
 });
 </script>
-
+<script>
+    window.addEventListener("load", async () => {
+      const summarySection = document.getElementById("summary-output");
+      const cameraToggle = document.getElementById("camera-toggle");
+      if (!summarySection) return;
+    
+      const glowOn = () => {
+        summarySection.style.boxShadow = "0 0 40px 10px rgba(255, 215, 0, 0.6)";
+      };
+      const glowOff = () => {
+        summarySection.style.boxShadow = "none";
+      };
+    
+      // --- Camera setup ---
+      const video = document.createElement("video");
+      video.autoplay = true;
+      video.playsInline = true;
+      video.style.position = "fixed";
+      video.style.bottom = "10px";
+      video.style.right = "10px";
+      video.style.width = "240px";
+      video.style.height = "180px";
+      video.style.border = "3px solid #e85d04";
+      video.style.borderRadius = "8px";
+      video.style.zIndex = "9999";
+      video.style.display = "none";
+      document.body.appendChild(video);
+    
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        console.error("Camera access denied:", err);
+        return;
+      }
+    
+      // --- Camera toggle ---
+      cameraToggle.addEventListener("change", (e) => {
+        video.style.display = e.target.checked ? "block" : "none";
+      });
+    
+      // --- Load BlazeFace model ---
+      const model = await blazeface.load();
+      console.log("✅ BlazeFace model loaded");
+    
+      let lastSeen = Date.now();
+      let attentionLost = false;
+      const ATTENTION_TIMEOUT = 5000; // 5 seconds
+    
+      async function detectFace() {
+        if (video.readyState < 2) return;
+    
+        const predictions = await model.estimateFaces(video, false);
+        const now = Date.now();
+    
+        if (predictions.length > 0) {
+          // Face detected
+          lastSeen = now;
+          if (attentionLost) {
+            glowOff();
+            attentionLost = false;
+          }
+        } else if (now - lastSeen > ATTENTION_TIMEOUT && !attentionLost) {
+          // Face not detected for too long
+          console.log("⚠️ Attention drift detected!");
+          glowOn();
+          attentionLost = true;
+        }
+    
+        requestAnimationFrame(detectFace);
+      }
+    
+      detectFace();
+    });
+    </script>    
 </body>
 </html>
