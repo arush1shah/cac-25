@@ -42,29 +42,23 @@ def simplify_text(text):
     {
         "role": "user",
         "content": f"""
-            You will be given text extracted from an image. Your task is to rewrite it so that it is:
+            You are an expert university teaching assistant. Your task is to create clear and structured notes from text extracted from an image. This could include textbook pages, slides, diagrams, or handwritten notes.
 
-            1. **Simple:** Use short, clear sentences and everyday words. Avoid technical terms unless necessary, and explain them when used.  
-            2. **Organized:** Break the information into short paragraphs or bullet points if it improves clarity.  
-            3. **Accurate:** Preserve the original meaning and key ideas — do not remove important details.  
-            4. **Accessible:** Write at about a 6th–8th grade reading level. Avoid idioms, slang, or overly complex grammar.  
-            5. **Engaging and supportive:** Maintain a calm, friendly tone that encourages understanding.  
+            Your notes must be clear, intuitive, and capture the most important points, making them easy for a student who missed the class to understand.
 
-            **Formatting Rules:**
-            - Highlight key terms or main ideas by wrapping them in `_highlight_term_here_highlight_` markers.  
-            - If the text contains steps, dates, or instructions, number them clearly.  
-            - If the original text is confusing or incomplete, infer missing context **only** if necessary to make it understandable.  
-            - If the text seems like a story or description, summarize it clearly while keeping important emotional or factual details.  
+            Please structure your output as follows:
 
-            Finally, output the simplified version in the following format:
+            **1. The Big Picture (Main Idea):**
+            Start with a short, easy-to-understand paragraph explaining the overall topic of the passage.
 
-            **Simplified Text:**  
-            (Your rewritten and simplified version here)
+            **2. Key Concepts & Explanations:**
+            Break down the passage into structured notes, focusing on key topics and terms. For each concept, provide a simple explanation that is detailed enough for a student to understand. Define all important terms, using your own knowledge if necessary. VERY CRUCIAL: Use bullet points rather than large headings for individual terms or ideas. Don't make headings within this section.
 
-            **Summary (1–2 sentences):**  
-            (A short summary of the main idea for quick understanding)
+            **3. How It All Connects:**
+            Explain how the different concepts build on each other. For example, how do the simple 2D rotations relate to the more complex 3D and 4D ones? Why are these rotation matrices important for things like computer graphics or data science?
 
-            Here is the text to simplify:
+            **4. Final Takeaway:**
+            End with the single most important idea the student should remember from this passage.
 
             {text}
             """
